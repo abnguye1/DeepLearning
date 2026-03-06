@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 2 | Modern Recurrent Neural Networks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="project2.css">
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">Deep Learning Project 2</p>
+  <h1>Modern Recurrent Neural Networks</h1>
+  <p class="subtitle">Andrew Nguyen | Spring 2026</p>
+  <div class="hero-links">
+    <a href="../index.html">Back to Landing Page</a>
+    <a href="https://www.kaggle.com/datasets/alincijov/time-machine" target="_blank" rel="noopener noreferrer">Time Machine Dataset</a>
+  </div>
+</header>
+
+<main class="container">
+  <section class="card">
+    <h2>Report Overview</h2>
+    <p>
+      This report studies character-level language modeling on <em>The Time Machine</em> dataset
+      using a basic RNN and GRU. I evaluate training stability, perplexity, and generated text quality
+      under different hyperparameter settings and architecture variants.
+    </p>
+    <ul>
+      <li><strong>Evaluation Metric:</strong> Validation perplexity (lower is better).</li>
+      <li><strong>Implementation:</strong> Built from scratch, following conceptual references only.</li>
+      <li><strong>Hardware/Runtime:</strong> [Fill in your environment details].</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Experimental Setup</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Dataset</td><td>The Time Machine (character-level)</td></tr>
+        <tr><td>Train/Validation Split</td><td>[Fill in split strategy]</td></tr>
+        <tr><td>Batch Size</td><td>[Fill in]</td></tr>
+        <tr><td>Sequence Length</td><td>[Fill in]</td></tr>
+        <tr><td>Optimizer</td><td>[Fill in]</td></tr>
+        <tr><td>Loss</td><td>Cross-entropy</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section-title">
+    <h2>Part 1: Basic RNN</h2>
+  </section>
+
+  <section class="card">
+    <h3>Task 1: Hyperparameter Tuning</h3>
+    <p>
+      Goal: Minimize validation perplexity by tuning number of epochs, hidden units,
+      time steps, and learning rate.
+    </p>
+
+    <h4>Top Configurations (3 or more)</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Config</th>
+          <th>Epochs</th>
+          <th>Hidden Units</th>
+          <th>Time Steps</th>
+          <th>Learning Rate</th>
+          <th>Best Train PPL</th>
+          <th>Best Val PPL</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>A</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+        <tr><td>B</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+        <tr><td>C</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+      </tbody>
+    </table>
+
+    <div class="figure-grid">
+      <figure>
+        <img src="images/rnn_config_a_ppl.png" alt="Training and validation perplexity for RNN configuration A">
+        <figcaption>Figure 1. RNN Config A: train vs validation perplexity.</figcaption>
+      </figure>
+      <figure>
+        <img src="images/rnn_config_b_ppl.png" alt="Training and validation perplexity for RNN configuration B">
+        <figcaption>Figure 2. RNN Config B: train vs validation perplexity.</figcaption>
+      </figure>
+      <figure>
+        <img src="images/rnn_config_c_ppl.png" alt="Training and validation perplexity for RNN configuration C">
+        <figcaption>Figure 3. RNN Config C: train vs validation perplexity.</figcaption>
+      </figure>
+    </div>
+
+    <h4>Discussion</h4>
+    <p>[Discuss which hyperparameters were most impactful and why.]</p>
+    <p>[State your best achieved perplexity and compare against other settings.]</p>
+  </section>
+
+  <section class="card">
+    <h3>Task 2: Gradient Clipping and Activation Functions</h3>
+
+    <h4>Experiment A: No Gradient Clipping</h4>
+    <figure>
+      <img src="images/rnn_no_clip_ppl.png" alt="RNN training and validation perplexity without gradient clipping">
+      <figcaption>Figure 4. Basic RNN without gradient clipping.</figcaption>
+    </figure>
+    <p>[Discuss instability, exploding gradients, and perplexity behavior.]</p>
+
+    <h4>Experiment B: ReLU Activation</h4>
+    <figure>
+      <img src="images/rnn_relu_ppl.png" alt="RNN training and validation perplexity with ReLU activation">
+      <figcaption>Figure 5. Basic RNN with ReLU activation.</figcaption>
+    </figure>
+    <p>[Discuss convergence speed, stability, and final perplexity.]</p>
+
+    <h4>Experiment C: ReLU + Gradient Clipping</h4>
+    <figure>
+      <img src="images/rnn_relu_clip_ppl.png" alt="RNN training and validation perplexity with ReLU and gradient clipping">
+      <figcaption>Figure 6. Basic RNN with ReLU and gradient clipping.</figcaption>
+    </figure>
+    <p>[Conclude whether clipping remains necessary with ReLU.]</p>
+  </section>
+
+  <section class="section-title">
+    <h2>Part 2: GRU</h2>
+  </section>
+
+  <section class="card">
+    <h3>Task 1: GRU Hyperparameter Tuning</h3>
+    <p>
+      Analyze how hidden units and learning rate affect runtime, perplexity, and generated outputs.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Config</th>
+          <th>Hidden Units</th>
+          <th>Learning Rate</th>
+          <th>Runtime / Epoch</th>
+          <th>Best Train PPL</th>
+          <th>Best Val PPL</th>
+          <th>Output Quality Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>G1</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+        <tr><td>G2</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+        <tr><td>G3</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+      </tbody>
+    </table>
+
+    <div class="figure-grid">
+      <figure>
+        <img src="images/gru_config_g1_ppl.png" alt="GRU training and validation perplexity for configuration G1">
+        <figcaption>Figure 7. GRU Config G1: train vs validation perplexity.</figcaption>
+      </figure>
+      <figure>
+        <img src="images/gru_config_g2_ppl.png" alt="GRU training and validation perplexity for configuration G2">
+        <figcaption>Figure 8. GRU Config G2: train vs validation perplexity.</figcaption>
+      </figure>
+      <figure>
+        <img src="images/gru_config_g3_ppl.png" alt="GRU training and validation perplexity for configuration G3">
+        <figcaption>Figure 9. GRU Config G3: train vs validation perplexity.</figcaption>
+      </figure>
+    </div>
+
+    <h4>Output Sequence Samples</h4>
+    <pre><code>[Paste sample text output for best GRU config]</code></pre>
+
+    <h4>Discussion</h4>
+    <p>[Explain trade-offs among runtime, perplexity, and generated sequence quality.]</p>
+  </section>
+
+  <section class="card">
+    <h3>Task 2: Ablation on GRU Gates</h3>
+    <p>
+      Compare standard GRU against two ablations:
+      only reset gate active (no update gate) and only update gate active (no reset gate).
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variant</th>
+          <th>Description</th>
+          <th>Best Train PPL</th>
+          <th>Best Val PPL</th>
+          <th>Runtime / Epoch</th>
+          <th>Stability Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Standard GRU</td><td>Both gates active</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+        <tr><td>Reset-only</td><td>Update gate removed</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+        <tr><td>Update-only</td><td>Reset gate removed</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+      </tbody>
+    </table>
+
+    <div class="figure-grid">
+      <figure>
+        <img src="images/gru_standard_ppl.png" alt="Perplexity curves for standard GRU">
+        <figcaption>Figure 10. Standard GRU perplexity curves.</figcaption>
+      </figure>
+      <figure>
+        <img src="images/gru_reset_only_ppl.png" alt="Perplexity curves for reset-gate-only GRU">
+        <figcaption>Figure 11. Reset-only GRU perplexity curves.</figcaption>
+      </figure>
+      <figure>
+        <img src="images/gru_update_only_ppl.png" alt="Perplexity curves for update-gate-only GRU">
+        <figcaption>Figure 12. Update-only GRU perplexity curves.</figcaption>
+      </figure>
+    </div>
+
+    <h4>Generated Sequence Examples</h4>
+    <h5>Standard GRU</h5>
+    <pre><code>[Paste sample output]</code></pre>
+    <h5>Reset-only GRU</h5>
+    <pre><code>[Paste sample output]</code></pre>
+    <h5>Update-only GRU</h5>
+    <pre><code>[Paste sample output]</code></pre>
+
+    <h4>Discussion</h4>
+    <p>[Explain what each gate contributes and how performance changes when one gate is removed.]</p>
+  </section>
+
+  <section class="card">
+    <h2>Final Summary</h2>
+    <ul>
+      <li>[Best model and final validation perplexity]</li>
+      <li>[Main finding about clipping and activations]</li>
+      <li>[Main finding about GRU gate ablations]</li>
+      <li>[What you would improve next]</li>
+    </ul>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p>© 2026 Andrew Nguyen</p>
+</footer>
+
+</body>
+</html>
