@@ -92,7 +92,7 @@
     <div class="figure-grid">
       <figure class="placeholder-figure">
         <div class="img-placeholder"><img src = "images/part1both.png"></div>
-        <figcaption>Figure 1. Testing and Validation Perplexity For Top 3 Configurations.</figcaption>
+        <figcaption>Figure 1. Training and Validation Perplexity For Top 3 Configurations.</figcaption>
       </figure>
 
 
@@ -122,13 +122,29 @@
       Increasing epochs from 20 to 30 improved the best-achieved validation perplexity, but several runs reached their minimum before the final epoch,
       indicating mild late overfitting. In this setting, <code>steps=50</code> gave the single best run when paired with <code>hidden=256</code> and <code>lr=1.0</code>.
     </p>
+
+    <p>
+      The learning rate had the strongest effect on model performance within the tested range. Models trained with a learning rate of 1.0 consistently achieved lower validation perplexity compared to 0.5 or 0.3.
+      Lower learning rates tended to slow convergence and resulted in slightly higher final perplexity values.
+    </p>
+
+    <p>
+      Increasing the hidden dimension from 128 to 256 produced a small but consistent improvement in validation perplexity. This suggests that a larger hidden representation allowed the RNN to capture richer character dependencies.
+      However, further increases beyond 256 (e.g., 320 or 384) did not lead to additional improvements, indicating diminishing returns for larger hidden sizes in this model.
+    </p>
+
+    <p>
+      The number of unrolled time steps had a smaller but noticeable impact. Runs with 50 time steps occasionally achieved slightly better perplexity than those with 35 time steps, suggesting that longer sequence context can improve language modeling performance.
+      However, the difference between the two settings was relatively small.
+    </p>
   </section>
 
   <section class="card">
     <h3>Task 2: Gradient Clipping and Activation Function Study</h3>
 
     <h4>Experiment A: No Gradient Clipping</h4>
-    <p>[Describe setup and compare training stability.]</p>
+    <p>Removing clipping resulted in little consequences to our training stability, but the validation curve expressed more instability.</p>
+    <p>However, testing validation was pretty consistent between implementing clipping and not.</p>
     <div class="figure-grid">
       <figure class="placeholder-figure">
         <div class="img-placeholder"><img src="images/part2noclipboth.png"></div>
@@ -137,7 +153,9 @@
     </div>
 
     <h4>Experiment B: Replace Activation with ReLU (With Clipping)</h4>
-    <p>[Describe setup and compare to baseline.]</p>
+    <p>ReLU resulted in better training and validation perplexities (~ -1) than tanh activation.</p>
+    <p>Interestingly, ReLU with clipping also had little effect on the training stability, but resulted in a less smooth validation curve than Tanh activation without clipping.</p>
+    <p>The best configuration we found earlier seemed to fare best in terms of stability, which was even smoother than the lower learning rate configuration.</p>
     <div class="figure-grid">
       <figure class="placeholder-figure">
         <div class="img-placeholder"><img src="images/part2reluclip.png"></div>
@@ -146,7 +164,8 @@
     </div>
 
     <h4>Experiment C: Replace Activation with ReLU (No Clipping)</h4>
-    <p>[Describe setup and compare to baseline.]</p>
+    <p>Even without clipping, ReLU showed improved performance in terms of training and validation perplexities, but by a much smaller margin (~ .1).</p>
+    <p>Removing clipping with ReLU seemed to have significantly less smooth validation curves even between both variants, but different configurations seemed to diverge from eachother more.</p>
     <div class="figure-grid">
       <figure class="placeholder-figure">
         <div class="img-placeholder"><img src="images/part2relunoclip.png"></div>
@@ -155,7 +174,8 @@
     </div>
 
     <h4>Do We Need Clipping with ReLU?</h4>
-    <p>[Discuss whether ReLU alone is sufficient or clipping+ReLU works better.]</p>
+    <p>Compared to our original trial using Tanh activation and clipping, ReLU performed much better in terms of validation perplexity, but had much less smooth validation curves</p>
+    <p>While not necessary, ReLU does result in marginally better perplexity without clipping, but improves significantly with it. Clipping also resulted in a much more smooth validation curve overall.</p>
   </section>
 
   <section class="section-title">
@@ -181,43 +201,60 @@
           <th>Runtime</th>
           <th>Best Train PPL</th>
           <th>Best Val PPL</th>
-          <th>Sample Output Quality</th>
+          <th>Output Sample</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>A</td><td>30</td><td>256</td><td>30</td><td>1.0</td><td>30</td><td>~4.3</td><td><strong>7.8106</strong></td><td>Best overall GRU run; strongest coherence among tested models.</td></tr>
-        <tr><td>B</td><td>30</td><td>256</td><td>30</td><td>1.2</td><td>30</td><td>~4.0</td><td>7.8190</td><td>Very close to best; slightly more aggressive LR but stable.</td></tr>
-        <tr><td>C</td><td>30</td><td>320</td><td>30</td><td>1.0</td><td>30</td><td>~4.4</td><td>7.8562</td><td>Larger hidden state helps, but not better than 256 in this search.</td></tr>
+        <tr><td>A</td><td>30</td><td>256</td><td>30</td><td>1.0</td><td>250.02s</td><td>~4.3</td><td><strong>7.8106</strong></td><td>the time traveller in the dimentions of the dimentions of the dimentions of the dimentions of the dimentions of the dimentions of</td></tr>
+        <tr><td>B</td><td>30</td><td>256</td><td>30</td><td>1.2</td><td>249.56s</td><td>~4.0</td><td>7.8190</td><td>the time that i had seemed to me the dimensions of the darkness of the darkness of the darkness of the darkness of the darkness</td></tr>
+        <tr><td>C</td><td>30</td><td>320</td><td>30</td><td>1.0</td><td>237.71s</td><td>~4.4</td><td>7.8562</td><td>the time traveller the strong had so the strong had so the strong had so the strong had so the strong had so the strong had so th
+.</td></tr>
       </tbody>
     </table>
 
     <h4>Perplexity Curves</h4>
     <div class="figure-grid">
       <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: GRU Config A train/val perplexity</div>
-        <figcaption>Figure 6. GRU Config A perplexity curves.</figcaption>
+        <div class="img-placeholder"><img src="images/gru_both.png"></div>
+        <figcaption>Figure 6. GRU Testing and Validation Perplexity For Top 3 Configurations.</figcaption>
       </figure>
+    </div>
+
+    <div class="figure-grid">
       <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: GRU Config B train/val perplexity</div>
-        <figcaption>Figure 7. GRU Config B perplexity curves.</figcaption>
+        <div class="img-placeholder"><img src="images/gru_training.png"></div>
+        <figcaption>Figure 7. GRU Training Perplexity For Top 3 Configurations.</figcaption>
       </figure>
+    </div>
+
+    <div class="figure-grid">
       <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: GRU Config C train/val perplexity</div>
-        <figcaption>Figure 8. GRU Config C perplexity curves.</figcaption>
+        <div class="img-placeholder"><img src="images/gru_validation.png"></div>
+        <figcaption>Figure 8. GRU Validation Perplexity For Top 3 Configurations.</figcaption>
       </figure>
     </div>
 
     <h4>Discussion</h4>
     <p>
       GRU tuning also used a broad-plus-targeted strategy. Round 1 baseline best was 8.0660, and targeted Round 2 reduced this to
-      <strong>7.8106</strong>, outperforming the basic RNN best in this project.
+      <strong>7.8106</strong>, outperforming the basic RNN best in this project (using Tanh + Clipping).
       The best region was around hidden sizes 256 to 320 with learning rates 1.0 to 1.2 and 30 epochs.
     </p>
     <p>
       In terms of trade-offs, increasing hidden size beyond 256 did not produce a large gain in validation perplexity,
-      so 256 is the best efficiency/quality point among tested settings.
-      Runtime-per-epoch was not separately logged in the sweep table, but larger hidden sizes are expected to cost more compute.
+      so 256 is the best efficiency/quality point among tested settings. Interestingly, it seemed that runtime may have decreased with larger hidden sizes, but that may be due to random variation in GPU load rather than a true effect.
     </p>
+
+    <p>
+      30 epochs had much better performance than 20 epochs, and the best runs reached their minima near the end of training, indicating that longer training was beneficial for GRU.
+      Longer time steps (50 vs 30) did not improve validation perplexity, and in some cases slightly worsened it.
+    </p>
+
+    <p>
+      In terms of the sample output, the second best configuration actually seemed to have the most coherent output, with more complete words and began repeating later in the sequence.
+      The best configuration had slightly better perplexity but produced a typo with earlier repetition.
+    </p>
+
   </section>
 
   <section class="card">
@@ -227,11 +264,11 @@
     <p>[Describe implementation choice and behavior.]</p>
     <div class="figure-grid">
       <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: Reset-only GRU perplexity</div>
+        <div class="img-placeholder"><img src = "images/reset_only.png"></div>
         <figcaption>Figure 9. Reset-only GRU train/val perplexity.</figcaption>
       </figure>
       <figure class="placeholder-figure">
-        <div class="code-placeholder">Insert generated sequence samples here</div>
+        <div class="code-placeholder">the time the morlocks the morlocks the morlocks the morlocks the morlocks the morlocks the morlocks the morlocks the morlocks the</div>
         <figcaption>Output sample: Reset-only variant.</figcaption>
       </figure>
     </div>
@@ -240,11 +277,11 @@
     <p>[Describe implementation choice and behavior.]</p>
     <div class="figure-grid">
       <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: Update-only GRU perplexity</div>
+        <div class="img-placeholder"><img src = "images/update_only.png"></div>
         <figcaption>Figure 10. Update-only GRU train/val perplexity.</figcaption>
       </figure>
       <figure class="placeholder-figure">
-        <div class="code-placeholder">Insert generated sequence samples here</div>
+        <div class="code-placeholder">the time traveller in the same of the same of the same of the same of the same of the same of the same of the same of the same of</div>
         <figcaption>Output sample: Update-only variant.</figcaption>
       </figure>
     </div>
@@ -252,17 +289,24 @@
     <h4>Control: Full GRU </h4>
     <div class="figure-grid">
       <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: Update-only GRU perplexity</div>
-        <figcaption>Figure 10. Update-only GRU train/val perplexity.</figcaption>
+        <div class="img-placeholder"><img src = "images/full_gru.png"></div>
+        <figcaption>Figure 11. Full GRU train/val perplexity.</figcaption>
       </figure>
       <figure class="placeholder-figure">
-        <div class="code-placeholder">Insert generated sequence samples here</div>
-        <figcaption>Output sample: Update-only variant.</figcaption>
+        <div class="code-placeholder">the time the strange in the strange in the strange in the strange in the strange in the strange in the strange in the strange in</div>
+        <figcaption>Output sample: Full GRU variant.</figcaption>
       </figure>
     </div>
 
     <h4>Discussion</h4>
-    <p>[Compare both ablations against full GRU and explain why performance changes.]</p>
+    <p>
+      All three models actually performed relatively similar in terms of validation perplexity, with relatively similar training curves. However, the update-only gate configuration had the smoothest validation curve, while the other two were a bit jagged. 
+      The reset-only variant had a slightly lower final perplexity, while the update-only and full GRU were quite close. However, the update-only GRU had a bigger gap between the control and reset-only, with a final validation perplexity of 8.343 compared to the 7.8-7.9 range the other two variants had. 
+    </p>
+    <p>
+      However, this may be due to an incorrect implementation of the ablation, which is not unlikely. Alternatively, random factors could have just favored the trial for the reset-only variant. 
+      The reset-only variation ran much faster than the other two, at 129.8 seconds compared to the full-gru's 147.08 seconds and the update-only's 161.20 seconds. 
+    </p>
   </section>
 
   <section class="card">
