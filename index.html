@@ -3,280 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project 2 | Modern Recurrent Neural Networks</title>
+<title>Deep Learning Project Reports</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="project2.css">
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <header class="hero">
-  <p class="eyebrow">Deep Learning Project 2</p>
-  <h1>Modern Recurrent Neural Networks</h1>
-  <p class="subtitle">Andrew Nguyen | Spring 2026</p>
-  <div class="hero-links">
-    <a href="../index.html">Back to Landing Page</a>
-    <a href="https://www.kaggle.com/datasets/alincijov/time-machine" target="_blank">Time Machine Dataset</a>
-  </div>
+<p class="eyebrow">Deep Learning Journal</p>
+<h1>Project Reports</h1>
+<p class="subtitle">Andrew Nguyen | <a class = "subtitle" href="https://github.com/abnguye1" target="_blank">github.com/abnguye1 (DL)</a> | <a class = "subtitle" href="https://github.com/rainbao" target="_blank">github.com/rainbao</a> | Spring 2026</p>
 </header>
 
-<main class="container">
-  <section class="card">
-    <h2>Report Overview</h2>
-    <p>
-      This report compares a scratch implementation of a Basic RNN and a GRU on
-      <em>The Time Machine</em> character-level language modeling task. Results are
-      discussed using validation perplexity, training stability, runtime, and
-      qualitative sample output sequences.
-    </p>
-    <ul>
-      <li><strong>Primary metric:</strong> Validation perplexity.</li>
-      <li><strong>Dataset:</strong> The Time Machine.</li>
-      <li><strong>Environment:</strong> Python 3.10 + PyTorch</li>
-    </ul>
-  </section>
-
-  <section class="card">
-    <h2>Experimental Setup</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Item</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Tokenization</td><td>Character-level</td></tr>
-        <tr><td>Train/Validation Split</td><td>90/10 split</td></tr>
-        <tr><td>Loss</td><td>Cross-entropy</td></tr>
-        <tr><td>Optimizer</td><td>SGD</td></tr>
-        <tr><td>Batch Size</td><td>32</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section-title">
-    <h2>Part 1: Basic RNN</h2>
-  </section>
-
-  <section class="card">
-    <h3>Task 1: Hyperparameter Tuning</h3>
-    <p>
-      Goal: achieve the lowest possible validation perplexity by tuning epochs,
-      hidden units, time steps, and learning rate.
-    </p>
-
-    <h4>Top 3 Configurations</h4>
-    <table>
-      <thead>
-        <tr>
-          <th>Config</th>
-          <th>Epochs</th>
-          <th>Hidden Units</th>
-          <th>Time Steps</th>
-          <th>Learning Rate</th>
-          <th>Best Train PPL</th>
-          <th>Best Val PPL</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>A</td><td>30</td><td>256</td><td>50</td><td>1.0</td><td>5.038</td><td><strong>8.5359</strong></td><td>Best overall in Round 2; best epoch 26.</td></tr>
-        <tr><td>B</td><td>30</td><td>256</td><td>35</td><td>0.8</td><td>4.965</td><td>8.6568</td><td>Stable convergence; near-best validation curve.</td></tr>
-        <tr><td>C</td><td>30</td><td>256</td><td>35</td><td>1.0</td><td>4.925</td><td>8.7461</td><td>Good early minima (best epoch 21), mild late overfitting.</td></tr>
-      </tbody>
-    </table>
-
-    <h4>Perplexity Curves</h4>
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder"><img src = "images/part1both.png"></div>
-        <figcaption>Figure 1. Testing and Validation Perplexity For Top 3 Configurations.</figcaption>
-      </figure>
+<main class="blog-container">
 
 
-    </div>
+<a class="post-card" href="project2/" style="--delay: 0.3s;">
+<p class="tag">Basic RNN</p>
+<h2>Project 2: Modern Recurrent Neural Networks</h2>
+<p>
+Implementation and experimentation with RNN architectures
+including gradient clipping and activation function analysis.
+</p>
+<div class="card-footer">
+<span class="date">Spring 2026</span>
+</div>
+</a>
 
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder"><img src = "images/part1train.png"></div>
-        <figcaption>Figure 2. Training Perplexities For Top 3 Configurations.</figcaption>
-      </figure>
-    </div>
-
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder"><img src = "images/part1validate.png"></div>
-        <figcaption>Figure 3. Validation Perplexities For Top 3 Configurations.</figcaption>
-      </figure>
-    </div>
-
-    <h4>Discussion</h4>
-    <p>
-      For the basic RNN, a two-round tuning strategy was used: an initial broad sweep followed by a targeted search near the strongest region.
-      The best validation perplexity improved from 8.7604 in the broad round to 8.5359 after targeted tuning.
-      The strongest runs consistently favored hidden units of 256 and relatively large learning rates (0.8 to 1.0).
-    </p>
-    <p>
-      Increasing epochs from 20 to 30 improved the best-achieved validation perplexity, but several runs reached their minimum before the final epoch,
-      indicating mild late overfitting. In this setting, <code>steps=50</code> gave the single best run when paired with <code>hidden=256</code> and <code>lr=1.0</code>.
-    </p>
-  </section>
-
-  <section class="card">
-    <h3>Task 2: Gradient Clipping and Activation Function Study</h3>
-
-    <h4>Experiment A: No Gradient Clipping</h4>
-    <p>[Describe setup and compare training stability.]</p>
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder"><img src="images/part2noclipboth.png"></div>
-        <figcaption>Figure 4. Basic RNN without gradient clipping.</figcaption>
-      </figure>
-    </div>
-
-    <h4>Experiment B: Replace Activation with ReLU (With Clipping)</h4>
-    <p>[Describe setup and compare to baseline.]</p>
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder"><img src="images/part2reluclip.png"></div>
-        <figcaption>Figure 5. Basic RNN with ReLU activation.</figcaption>
-      </figure>
-    </div>
-
-    <h4>Experiment C: Replace Activation with ReLU (No Clipping)</h4>
-    <p>[Describe setup and compare to baseline.]</p>
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder"><img src="images/part2relunoclip.png"></div>
-        <figcaption>Figure 5. Basic RNN with ReLU activation without gradient clipping.</figcaption>
-      </figure>
-    </div>
-
-    <h4>Do We Need Clipping with ReLU?</h4>
-    <p>[Discuss whether ReLU alone is sufficient or clipping+ReLU works better.]</p>
-  </section>
-
-  <section class="section-title">
-    <h2>Part 2: GRU</h2>
-  </section>
-
-  <section class="card">
-    <h3>Task 1: Hyperparameter Tuning and Analysis</h3>
-    <p>
-      Tune hyperparameters and
-      then analyze runtime, perplexity, and output sequence quality.
-    </p>
-
-    <h4>Top 3 Configurations</h4>
-    <table>
-      <thead>
-        <tr>
-          <th>Config</th>
-          <th>Epochs</th>
-          <th>Hidden Units</th>
-          <th>Time Steps</th>
-          <th>Learning Rate</th>
-          <th>Runtime</th>
-          <th>Best Train PPL</th>
-          <th>Best Val PPL</th>
-          <th>Sample Output Quality</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>A</td><td>30</td><td>256</td><td>30</td><td>1.0</td><td>30</td><td>~4.3</td><td><strong>7.8106</strong></td><td>Best overall GRU run; strongest coherence among tested models.</td></tr>
-        <tr><td>B</td><td>30</td><td>256</td><td>30</td><td>1.2</td><td>30</td><td>~4.0</td><td>7.8190</td><td>Very close to best; slightly more aggressive LR but stable.</td></tr>
-        <tr><td>C</td><td>30</td><td>320</td><td>30</td><td>1.0</td><td>30</td><td>~4.4</td><td>7.8562</td><td>Larger hidden state helps, but not better than 256 in this search.</td></tr>
-      </tbody>
-    </table>
-
-    <h4>Perplexity Curves</h4>
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: GRU Config A train/val perplexity</div>
-        <figcaption>Figure 6. GRU Config A perplexity curves.</figcaption>
-      </figure>
-      <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: GRU Config B train/val perplexity</div>
-        <figcaption>Figure 7. GRU Config B perplexity curves.</figcaption>
-      </figure>
-      <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: GRU Config C train/val perplexity</div>
-        <figcaption>Figure 8. GRU Config C perplexity curves.</figcaption>
-      </figure>
-    </div>
-
-    <h4>Discussion</h4>
-    <p>
-      GRU tuning also used a broad-plus-targeted strategy. Round 1 baseline best was 8.0660, and targeted Round 2 reduced this to
-      <strong>7.8106</strong>, outperforming the basic RNN best in this project.
-      The best region was around hidden sizes 256 to 320 with learning rates 1.0 to 1.2 and 30 epochs.
-    </p>
-    <p>
-      In terms of trade-offs, increasing hidden size beyond 256 did not produce a large gain in validation perplexity,
-      so 256 is the best efficiency/quality point among tested settings.
-      Runtime-per-epoch was not separately logged in the sweep table, but larger hidden sizes are expected to cost more compute.
-    </p>
-  </section>
-
-  <section class="card">
-    <h3>Task 2: Ablation Study on GRU Gates</h3>
-
-    <h4>Variant A: Reset Gate Only (No Update Gate)</h4>
-    <p>[Describe implementation choice and behavior.]</p>
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: Reset-only GRU perplexity</div>
-        <figcaption>Figure 9. Reset-only GRU train/val perplexity.</figcaption>
-      </figure>
-      <figure class="placeholder-figure">
-        <div class="code-placeholder">Insert generated sequence samples here</div>
-        <figcaption>Output sample: Reset-only variant.</figcaption>
-      </figure>
-    </div>
-
-    <h4>Variant B: Update Gate Only (No Reset Gate)</h4>
-    <p>[Describe implementation choice and behavior.]</p>
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: Update-only GRU perplexity</div>
-        <figcaption>Figure 10. Update-only GRU train/val perplexity.</figcaption>
-      </figure>
-      <figure class="placeholder-figure">
-        <div class="code-placeholder">Insert generated sequence samples here</div>
-        <figcaption>Output sample: Update-only variant.</figcaption>
-      </figure>
-    </div>
-
-    <h4>Control: Full GRU </h4>
-    <div class="figure-grid">
-      <figure class="placeholder-figure">
-        <div class="img-placeholder">Insert screenshot: Update-only GRU perplexity</div>
-        <figcaption>Figure 10. Update-only GRU train/val perplexity.</figcaption>
-      </figure>
-      <figure class="placeholder-figure">
-        <div class="code-placeholder">Insert generated sequence samples here</div>
-        <figcaption>Output sample: Update-only variant.</figcaption>
-      </figure>
-    </div>
-
-    <h4>Discussion</h4>
-    <p>[Compare both ablations against full GRU and explain why performance changes.]</p>
-  </section>
-
-  <section class="card">
-    <h2>Final Takeaways</h2>
-    <ul>
-      <li>Targeted second-round tuning consistently improved results over the initial broad sweep for both RNN and GRU.</li>
-      <li>Best basic RNN configuration reached validation perplexity 8.5359; best GRU reached 7.8106 (lower is better).</li>
-      <li>Across both models, moderate-to-high learning rates (around 1.0), hidden size near 256, and longer training (30 epochs) were the most effective tested settings.</li>
-    </ul>
-  </section>
 </main>
 
 <footer class="site-footer">
-  <p>© 2026 Andrew Nguyen</p>
+<p>© 2026 Andrew Nguyen</p>
 </footer>
 
 </body>
