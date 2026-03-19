@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 3 | Attention and Transformer Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="project3.css">
+</head>
+<body>
+
+<header class="hero">
+	<p class="eyebrow">Deep Learning Project 3</p>
+	<h1>Attention Mechanisms for Machine Translation</h1>
+	<p class="subtitle">Andrew Nguyen | Spring 2026</p>
+	<div class="hero-links">
+		<a href="../index.html">Back to Landing Page</a>
+		<a href="https://d2l.ai/chapter_recurrent-modern/machine-translation-and-dataset.html#downloading-and-preprocessing-the-dataset" target="_blank" rel="noopener noreferrer">English-French Dataset</a>
+	</div>
+</header>
+
+<main class="container">
+	<section class="card lead-card">
+		<h2>Objective</h2>
+		<p>
+			This project explores three core ideas behind modern sequence modeling:
+			basic attention, multi-head attention, and the Transformer architecture.
+			The central goal is to understand not only how to implement these models,
+			but why they improve machine translation compared with traditional RNN
+			encoder-decoder baselines.
+		</p>
+		<p>
+			Across all experiments, I evaluate translation quality with BLEU score and
+			monitor optimization behavior through training and validation loss curves.
+			The report focuses on architectural decisions, hyperparameter effects,
+			interpretability via attention visualization, and practical trade-offs.
+		</p>
+	</section>
+
+	<section class="card">
+		<h2>How Attention Works (Conceptual Introduction)</h2>
+
+		<h3>Basic Attention in Encoder-Decoder Models</h3>
+		<p>
+			In a vanilla Seq2Seq model, the decoder relies heavily on a single fixed
+			context vector from the encoder, which can become a bottleneck for long or
+			complex sentences. Attention addresses this by letting the decoder compute
+			a weighted combination of all encoder hidden states at each decoding step.
+			These weights indicate which source positions are most relevant to the
+			current target token prediction.
+		</p>
+
+		<h3>Multi-Head Attention</h3>
+		<p>
+			Multi-head attention extends this idea by projecting queries, keys, and
+			values into multiple subspaces and attending in parallel. Instead of one
+			monolithic alignment, each head can specialize in different linguistic
+			patterns, such as local word alignment, long-range dependencies, or phrase
+			structure. Head outputs are concatenated and linearly transformed, allowing
+			the model to integrate diverse contextual signals.
+		</p>
+
+		<h3>Transformer Architecture</h3>
+		<p>
+			The Transformer removes recurrence and relies entirely on attention and
+			feed-forward blocks. Positional encodings provide token order information,
+			while stacked self-attention layers model token interactions globally.
+			Compared to RNNs, Transformers train more efficiently in parallel and
+			often capture long-distance dependencies more effectively, which usually
+			translates into stronger BLEU performance.
+		</p>
+	</section>
+
+	<section class="card">
+		<h2>Experimental Setup</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Item</th>
+					<th>Value</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr><td>Dataset</td><td>English-French translation dataset from D2L</td></tr>
+				<tr><td>Train/Validation Split</td><td>[Fill in]</td></tr>
+				<tr><td>Tokenization / Vocabulary</td><td>[Fill in]</td></tr>
+				<tr><td>Loss</td><td>[Fill in]</td></tr>
+				<tr><td>Optimizer</td><td>[Fill in]</td></tr>
+				<tr><td>BLEU Evaluation Set</td><td>Same test data used in Project 2 Part 3</td></tr>
+				<tr><td>Hardware</td><td>[Fill in]</td></tr>
+			</tbody>
+		</table>
+	</section>
+
+	<section class="section-title">
+		<h2>Part 1: Basic Attention Mechanism</h2>
+	</section>
+
+	<section class="card">
+		<h3>Task 1: Hyperparameter Tuning</h3>
+		<p>
+			I tuned the attention-based encoder-decoder to maximize BLEU score while
+			maintaining stable convergence.
+		</p>
+
+		<h4>Top Configurations (at least 3)</h4>
+		<table>
+			<thead>
+				<tr>
+					<th>Config</th>
+					<th>Epochs</th>
+					<th>Hidden Size</th>
+					<th>Learning Rate</th>
+					<th>Dropout</th>
+					<th>Best Val Loss</th>
+					<th>BLEU</th>
+					<th>Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr><td>A</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+				<tr><td>B</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+				<tr><td>C</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+			</tbody>
+		</table>
+
+		<h4>Loss Curves</h4>
+		<div class="figure-grid">
+			<figure>
+				<div class="img-placeholder">Insert screenshot: Part 1 Config A train/val loss</div>
+				<figcaption>Figure 1. Basic attention (Config A) loss curves.</figcaption>
+			</figure>
+			<figure>
+				<div class="img-placeholder">Insert screenshot: Part 1 Config B train/val loss</div>
+				<figcaption>Figure 2. Basic attention (Config B) loss curves.</figcaption>
+			</figure>
+			<figure>
+				<div class="img-placeholder">Insert screenshot: Part 1 Config C train/val loss</div>
+				<figcaption>Figure 3. Basic attention (Config C) loss curves.</figcaption>
+			</figure>
+		</div>
+
+		<h4>Discussion</h4>
+		<p>[Write 1 to 2 paragraphs about trends and hyperparameter effects on BLEU/loss.]</p>
+	</section>
+
+	<section class="card">
+		<h3>Task 2: Attention Visualization</h3>
+		<p>
+			For selected sentence pairs, I visualize attention weights to inspect
+			alignment behavior between source and target tokens.
+		</p>
+
+		<div class="figure-grid">
+			<figure>
+				<div class="img-placeholder">Insert screenshot: attention heatmap example 1</div>
+				<figcaption>Figure 4. Attention heatmap for sentence pair 1.</figcaption>
+			</figure>
+			<figure>
+				<div class="img-placeholder">Insert screenshot: attention heatmap example 2</div>
+				<figcaption>Figure 5. Attention heatmap for sentence pair 2.</figcaption>
+			</figure>
+		</div>
+
+		<h4>Interpretation</h4>
+		<p>[Discuss what tokens the model attends to, and where alignments are weak.]</p>
+	</section>
+
+	<section class="section-title">
+		<h2>Part 2: Multi-Head Attention</h2>
+	</section>
+
+	<section class="card">
+		<h3>Task 1: Implement and Compare Multi-Head Attention</h3>
+		<p>
+			I replaced single-head attention with multi-head attention and compared
+			optimization and translation quality against Part 1.
+		</p>
+
+		<h4>Head Count Study</h4>
+		<table>
+			<thead>
+				<tr>
+					<th>Heads</th>
+					<th>Train Loss (final)</th>
+					<th>Val Loss (best)</th>
+					<th>BLEU</th>
+					<th>Runtime / Epoch</th>
+					<th>Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr><td>1</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+				<tr><td>2</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+				<tr><td>4</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+				<tr><td>8</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+			</tbody>
+		</table>
+
+		<h4>Training Curves</h4>
+		<div class="figure-grid">
+			<figure>
+				<div class="img-placeholder">Insert screenshot: multi-head train/val loss</div>
+				<figcaption>Figure 6. Multi-head attention loss curves.</figcaption>
+			</figure>
+			<figure>
+				<div class="img-placeholder">Insert screenshot: BLEU comparison bar chart</div>
+				<figcaption>Figure 7. BLEU comparison between Part 1 and Part 2.</figcaption>
+			</figure>
+		</div>
+
+		<h4>Discussion</h4>
+		<p>[Discuss quality changes and the impact of head count (1, 2, 4, 8).]</p>
+	</section>
+
+	<section class="card">
+		<h3>Task 2: Analysis of Attention Heads</h3>
+		<p>
+			To examine specialization across heads, I visualize per-head attention
+			maps for translated sentence pairs and compare diversity versus overlap.
+		</p>
+
+		<div class="figure-grid">
+			<figure>
+				<div class="img-placeholder">Insert screenshot: per-head heatmaps example 1</div>
+				<figcaption>Figure 8. Attention maps per head for sentence pair 1.</figcaption>
+			</figure>
+			<figure>
+				<div class="img-placeholder">Insert screenshot: per-head heatmaps example 2</div>
+				<figcaption>Figure 9. Attention maps per head for sentence pair 2.</figcaption>
+			</figure>
+		</div>
+
+		<h4>Interpretation</h4>
+		<p>[Discuss whether heads capture distinct patterns or exhibit redundancy.]</p>
+	</section>
+
+	<section class="card">
+		<h2>Transformer Extension (Optional / Bonus)</h2>
+		<p>
+			If implemented, summarize how the full Transformer compares with
+			attention-based RNN variants in BLEU, speed, and qualitative outputs.
+		</p>
+		<p>[Add results here if applicable.]</p>
+	</section>
+
+	<section class="card">
+		<h2>Final Reflection</h2>
+		<ul>
+			<li>[Most important technical insight]</li>
+			<li>[Most important experimental insight]</li>
+			<li>[Potential next improvement]</li>
+		</ul>
+	</section>
+</main>
+
+<footer class="site-footer">
+	<p>© 2026 Andrew Nguyen</p>
+</footer>
+
+</body>
+</html>
