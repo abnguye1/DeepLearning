@@ -28,8 +28,7 @@
 			This project explores two core ideas behind modern sequence modeling:
 			basic attention and multi-head attention.
 			We focus on trying to understand not only how to implement these mechanisms,
-			but also their effect on improving machine translation compared with traditional RNN
-			encoder-decoder models and their differences.
+			but also their differences from traditional RNNs.
 		</p>
 		<p>
 			Across all experiments, I evaluate translation quality from English to French with BLEU score and
@@ -128,11 +127,15 @@
 			The encoder is a stacked GRU (Seq2SeqEncoder) with token embeddings and
 			Xavier initialization. It outputs the full source hidden-state sequence
 			(shape: <code>num_steps x batch_size x num_hiddens</code>) and final hidden state.
+
+		</p>
+		<p>
 			The decoder (Seq2SeqBahdanauDecoder) is also GRU-based and decodes one token at a time.
 			At each target step, it uses the top decoder hidden state as the query,
 			attends over all encoder outputs, concatenates context with the current target embedding,
 			and feeds that into the GRU before projecting with a linear layer to vocabulary logits.
 		</p>
+
 		<h4>How Attention is Computed (Additive / Bahdanau)</h4>
 		<p>
 			For each decoding step, with decoder query q and encoder keys/values k,v, the model computes:
@@ -147,10 +150,11 @@
 		<h3>Task 1: Hyperparameter Tuning</h3>
 		<p>
 			I tuned the hyperparameters of the attention-based encoder-decoder with the aim to maximize BLEU score. 
+			Below are all 13 configurations tested, sorted by BLEU score to highlight performance rankings.
 		</p>
 
 
-		<h4>Top 3 Configurations by BLEU Score</h4>
+		<h4>13 Configurations - Sorted by BLEU Score</h4>
 		<table>
 			<thead>
 				<tr>
@@ -165,13 +169,23 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr><td>B</td><td>256</td><td>256</td><td>2</td><td>0.10</td><td>0.0030</td><td>128</td><td>0.1829</td></tr>
-				<tr><td>E</td><td>256</td><td>256</td><td>2</td><td>0.20</td><td>0.0015</td><td>64</td><td>0.1829</td></tr>
+				<tr><td>B</td><td>256</td><td>256</td><td>2</td><td>0.10</td><td>0.0030</td><td>128</td><td><strong>0.1829</strong></td></tr>
+				<tr><td>E</td><td>256</td><td>256</td><td>2</td><td>0.20</td><td>0.0015</td><td>64</td><td><strong>0.1829</strong></td></tr>
 				<tr><td>I</td><td>256</td><td>256</td><td>2</td><td>0.25</td><td>0.0030</td><td>256</td><td>0.1801</td></tr>
+				<tr><td>A</td><td>256</td><td>256</td><td>2</td><td>0.20</td><td>0.0050</td><td>128</td><td>0.1769</td></tr>
+				<tr><td>G</td><td>256</td><td>256</td><td>2</td><td>0.20</td><td>0.0075</td><td>128</td><td>0.1769</td></tr>
+				<tr><td>H</td><td>256</td><td>256</td><td>2</td><td>0.15</td><td>0.0030</td><td>64</td><td>0.1769</td></tr>
+				<tr><td>C</td><td>384</td><td>384</td><td>2</td><td>0.20</td><td>0.0030</td><td>128</td><td>0.1500</td></tr>
+				<tr><td>D</td><td>256</td><td>256</td><td>3</td><td>0.30</td><td>0.0030</td><td>128</td><td>0.1500</td></tr>
+				<tr><td>K</td><td>512</td><td>512</td><td>2</td><td>0.20</td><td>0.0030</td><td>128</td><td>0.1500</td></tr>
+				<tr><td>L</td><td>256</td><td>256</td><td>1</td><td>0.20</td><td>0.0030</td><td>128</td><td>0.1500</td></tr>
+				<tr><td>M</td><td>256</td><td>256</td><td>4</td><td>0.20</td><td>0.0030</td><td>128</td><td>0.1025</td></tr>
+				<tr><td>J</td><td>128</td><td>128</td><td>2</td><td>0.20</td><td>0.0030</td><td>128</td><td>0.0585</td></tr>
+				<tr><td>F</td><td>256</td><td>256</td><td>2</td><td>0.20</td><td>0.0010</td><td>128</td><td>0.0256</td></tr>
 			</tbody>
 		</table>
 
-		<h4>Loss Curves</h4>
+		<h4>Loss Curves for the Top 3 Configurations by BLEU Score</h4>
 		<div class="figure-grid">
 			<figure>
 				<div class="img-placeholder"><img src = "images/configB_1.svg" alt="Config B Loss Curves"></div>
@@ -188,7 +202,39 @@
 		</div>
 
 		<h4>Discussion</h4>
-		<p>[Write 1 to 2 paragraphs about trends and hyperparameter effects on BLEU/loss.]</p>
+		<p>
+			Across 13 configurations trained for 30 epochs, Configs B and E achieved identical top performance (BLEU = 0.1829) 
+			despite differing in dropout rate (0.10 vs. 0.20) and batch size (128 vs. 64), indicating that multiple hyperparameter 
+			combinations can converge to strong results. This redundancy in optimal solutions reflects the robustness of the 2-layer 
+			GRU encoder–decoder architecture with Bahdanau attention when core dimensions are held at 256. 
+		</p>
+		<p>
+			Learning rate emerged as 
+			the most critical hyperparameter: the optimal range of 0.0015–0.003 yielded consistent performance above 0.1769 BLEU, 
+			while the lowest rate tested (0.001 in Config F) resulted in severe degradation to 0.0256 BLEU, indicating insufficient 
+			gradient flow over the 30-epoch training window. Conversely, higher rates (≥0.005) shifted only slightly downward, 
+			suggesting the model is more sensitive to undertraining than to moderate overtraining in this scenario.
+		</p>
+		<p>
+			Regularization and model capacity also play important roles. Dropout rates between 0.10–0.20 (Configs B, A, E, H) 
+			produced the strongest results, while more aggressive regularization (0.25–0.30) degraded performance, indicating 
+			that the 20-sentence test set does not require heavy dropout for generalization. Embedding and hidden dimensions of 
+			256 proved optimal; scaling down to 128 (Config J, BLEU = 0.0585) caused severe underfitting, while scaling up to 384–512 (Configs C, K) 
+			showed no improvement and potentially incurred overfitting costs.
+		</p>
+
+		<p>
+			Network depth exhibited a clear relationship with performance: the 
+			baseline 2-layer architecture achieved the highest scores, while single-layer models (Config L, 0.1500) had reduced capacity, and 
+			deeper architectures (3–4 layers, Configs D and M) suffered from 0.1500–0.1025 BLEU respectively, likely due to optimization difficulties 
+			on the limited dataset. 
+		</p>
+
+		<p>
+			These results suggest that for the English–French translation task with a 20-sentence evaluation set, 
+			the model achieves a practical optimum at moderate depth, standard dimensionality, and moderate regularization, 
+			with learning rate calibration being the decisive factor.
+		</p>
 	</section>
 
 	<section class="card">
@@ -237,7 +283,38 @@
 
 
 		<h4>Discussion</h4>
-		<p>[Discuss what tokens the model attends to, and where alignments are weak.]</p>
+		<p>
+			The attention heatmaps reveal a mix of logical alignment and significant structural limitations. 
+			In the simplest case, "go ." (Figure 1), the Bahdanau mechanism successfully focuses on the source tokens, 
+			though it seems to focus heavily on the period (.) for the translation of the verb. 
+			However, as sentence complexity increases, the model’s "focus" becomes less precise.
+		</p>
+
+		<p>
+			A critical observation across Figures 2 and 3 is the emergence of the (&lt;unk&gt;) token. 
+			While the attention weights often point toward the correct source words—such as the model 
+			looking at "the" while predicting a placeholder for "bibliothèque"—the lack of vocabulary 
+			depth prevents a successful translation. This confirms that while the attention mechanism is 
+			"searching" in the right place, the decoder lacks the mapping to produce the target word.
+
+		</p>
+
+		<p>
+			Furthermore, Figure 4 ("she speaks...") highlights a specific failure in subject-verb agreement 
+			and pronoun translation. Despite the attention mechanism focusing sharply on the correct source 
+			verb "speaks," the model incorrectly predicts "je" (I) instead of "elle" (she). 
+			This "attention-fact mismatch" suggests that the model is struggling to integrate context
+			from the entire source sequence, often fixating on a single
+			word while ignoring the surrounding syntax.
+
+		</p>
+
+		<p>
+			Ultimately, these visualizations indicate that while the attention mechanism is 
+			functioning, evidenced by the non-random, heat-mapped alignments, the model itself is severely 
+			bottlenecked by underlying vocabulary and an inability to maintain long-range dependencies
+			within the small training set.
+		</p>
 	</section>
 
 	<section class="section-title">
@@ -275,7 +352,8 @@
 		</p>
 
 		<p>
-			The configurations only differ in batch size, dropout, and learning rate, so this allows us to see how multi-head attention interacts with these hyperparameters specifically, while still
+			The configurations only differ in batch size, dropout, and learning rate, so this allows us to see
+			 how multi-head attention interacts with these hyperparameters specifically, while still
 			controlling for other factors like embedding size, hidden size, and number of layers.
 		</p>
 
@@ -321,14 +399,22 @@
 		</div>
 
 		<h4>Discussion</h4>
-		<p>[Discuss quality changes and the impact of head count (1, 2, 4, 8).]</p>
+		<p>
+			Multi-head attention demonstrates conditional gains over single-head attention, with performance strongly dependent on the underlying hyperparameter configuration. Under the strong Config B setting (dropout=0.1, lr=0.003, bs=128), increasing head count from 1 to 4–8 improved BLEU from 0.1500 to 0.1829 (a 22% gain), matching the Part 1 single-head baseline. In contrast, under the weaker Config E setting (dropout=0.2, lr=0.0015, bs=64), all head counts yielded the same BLEU of 0.1500, indicating that head count provides no benefit when the underlying hyperparameters themselves are not ideal.
+		</p>
+		<p>
+			This pattern suggests that multi-head attention requires a well-tuned learning rate and regularization schedule to be effective. Increasing model capacity (via heads) cannot compensate for poor optimization and the benefits of multi-head attention are contingent on suitable training dynamics and architecture, which may depend on the dataset size and complexity.
+		</p>
+		<p>
+			The training curves show that Config B configurations with 4+ heads converge smoothly, while Config E exhibits slower or plateau-like convergence regardless of head count, reinforcing the dominance of base hyperparameters. Notably, the best Part 2 BLEU (0.1829) exactly matches the best Part 1 BLEU, indicating that improving the underlying optimization is at least as important as architectural complexity for this low-resource translation task.
+		</p>
 	</section>
 
 	<section class="card">
 		<h3>Task 2: Analysis of Attention Heads</h3>
 		<p>
 			To examine specialization across heads, I visualize per-head attention
-			maps in a 4-head model for translated sentence pairs and compare diversity versus overlap.
+			maps in a 4-head model for translated sentence pairs and compare differences and overlap.
 		</p>
 
 		<div class="note-box">
@@ -398,19 +484,53 @@
 		</div>
 
 		<h4>Discussion</h4>
-		<p>[Discuss whether heads capture distinct patterns or exhibit redundancy.]</p>
+		<p>
+			Visual inspection of per-head attention maps reveals that individual heads capture interpretable but substantially 
+			redundant alignment patterns. On simpler test examples (e.g., 'go .' → 'va !'), all heads converge to nearly identical 
+			focused alignments, with the average attention map closely resembling individual head patterns. 
+			This redundancy suggests that the model learns a single optimal alignment strategy early in training 
+			and the additional heads do not specialize into complementary roles. 
+		</p>
+		<p>
+			On longer or more complex sentences (e.g., 'where is the library?' → 'où est la bibliothèque ?'), 
+			individual heads show somewhat greater diversity in their alignment focus, with some heads attending to determiners 
+			or punctuation while others focus on content words. However, this modest specialization does not translate to improved 
+			overall translation quality: the best Part 2 multi-head BLEU (0.1829 with 4–8 heads on Config B) exactly matches the best 
+			single-head result from Part 1, and per-head attention redundancy on easy examples mirrors the low variance in BLEU scores 
+			across head counts on the same hyperparameter setting.
+		</p>
+		<p>
+			The lack of overall BLEU improvement despite multi-head architecture suggests that neither attention 
+			specialization nor head diversity is the issue for this small-scale machine translation task. 
+			Instead, the core limitations appear to be the vocabulary size, data scarcity, and the difficulty of 
+			aligning rare or unknown tokens.
+		</p>
+		<p>
+			In practical terms, this finding implies that for low-resource translation settings, 
+			investing effort in single-head attention tuning, such as optimizing learning rate, regularization, and model dimensions, yields 
+			greater returns than simply multiplying the number of attention heads. Multi-head attention may offer benefits on larger, 
+			more diverse datasets where specialization can emerge naturally. On smaller datasets, however,
+			the architectural overhead results in redundant computation without comparable performance gains.
+		</p>
 	</section>
 
+	<div class = "card">
+		<h3>Conclusion</h3>
+		<p>
+			This project demonstrates that while attention mechanisms can significantly improve translation quality
+			over vanilla Seq2Seq models, the benefits of multi-head attention are highly contingent on underlying hyperparameter optimization. 
+		</p>
+		<p>
+			In a low-resource English–French translation task, careful tuning of learning rate and regularization proved 
+			more critical than increasing head count, with multi-head attention providing no BLEU improvement when base hyperparameters were suboptimal.
+		</p>	
+		<p>
+			Attention visualizations revealed that while the mechanism is functioning, the model struggles with vocabulary limitations and 
+			long-range dependencies, leading to redundant head behavior and limited translation quality. 
+			Possibilities could include exploring larger datasets or alternative architectures to better leverage multi-head attention's potential.
+		</p>
+	</div>
 
-
-	<section class="card">
-		<h2>Final Reflection</h2>
-		<ul>
-			<li>[Most important technical insight]</li>
-			<li>[Most important experimental insight]</li>
-			<li>[Potential next improvement]</li>
-		</ul>
-	</section>
 </main>
 
 <footer class="site-footer">
