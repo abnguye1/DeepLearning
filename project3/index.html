@@ -13,7 +13,7 @@
 
 <header class="hero">
 	<p class="eyebrow">Deep Learning Project 3</p>
-	<h1>Attention Mechanisms for Machine Translation</h1>
+	<h1>Attention and Transformers</h1>
 	<p class="subtitle">Andrew Nguyen | Spring 2026</p>
 	<div class="hero-links">
 		<a href="../index.html">Back to Landing Page</a>
@@ -25,22 +25,22 @@
 	<section class="card lead-card">
 		<h2>Objective</h2>
 		<p>
-			This project explores three core ideas behind modern sequence modeling:
-			basic attention, multi-head attention, and the Transformer architecture.
-			The central goal is to understand not only how to implement these models,
-			but why they improve machine translation compared with traditional RNN
-			encoder-decoder baselines.
+			This project explores two core ideas behind modern sequence modeling:
+			basic attention and multi-head attention.
+			We focus on trying to understand not only how to implement these mechanisms,
+			but also their effect on improving machine translation compared with traditional RNN
+			encoder-decoder models and their differences.
 		</p>
 		<p>
-			Across all experiments, I evaluate translation quality with BLEU score and
+			Across all experiments, I evaluate translation quality from English to French with BLEU score and
 			monitor optimization behavior through training and validation loss curves.
 			The report focuses on architectural decisions, hyperparameter effects,
-			interpretability via attention visualization, and practical trade-offs.
+			interpretability via attention visualization, and trade-offs.
 		</p>
 	</section>
 
 	<section class="card">
-		<h2>How Attention Works (Conceptual Introduction)</h2>
+		<h2>How Attention Works</h2>
 
 		<h3>Basic Attention in Encoder-Decoder Models</h3>
 		<p>
@@ -59,86 +59,131 @@
 			monolithic alignment, each head can specialize in different linguistic
 			patterns, such as local word alignment, long-range dependencies, or phrase
 			structure. Head outputs are concatenated and linearly transformed, allowing
-			the model to integrate diverse contextual signals.
+			the model to work with diverse contextual elements.
 		</p>
 
-		<h3>Transformer Architecture</h3>
-		<p>
-			The Transformer removes recurrence and relies entirely on attention and
-			feed-forward blocks. Positional encodings provide token order information,
-			while stacked self-attention layers model token interactions globally.
-			Compared to RNNs, Transformers train more efficiently in parallel and
-			often capture long-distance dependencies more effectively, which usually
-			translates into stronger BLEU performance.
-		</p>
+
 	</section>
 
-	<section class="card">
-		<h2>Experimental Setup</h2>
-		<table>
-			<thead>
-				<tr>
-					<th>Item</th>
-					<th>Value</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr><td>Dataset</td><td>English-French translation dataset from D2L</td></tr>
-				<tr><td>Train/Validation Split</td><td>[Fill in]</td></tr>
-				<tr><td>Tokenization / Vocabulary</td><td>[Fill in]</td></tr>
-				<tr><td>Loss</td><td>[Fill in]</td></tr>
-				<tr><td>Optimizer</td><td>[Fill in]</td></tr>
-				<tr><td>BLEU Evaluation Set</td><td>Same test data used in Project 2 Part 3</td></tr>
-				<tr><td>Hardware</td><td>[Fill in]</td></tr>
-			</tbody>
-		</table>
+	<section class = "card">
+		<h2>Model Evaluation</h2>
+		<p>
+			I evaluate model performance using BLEU score, which measures n-gram
+			overlap between generated translations and reference translations. Higher
+			BLEU indicates better translation quality. I also analyze training and
+			validation loss curves to understand optimization dynamics and potential
+			overfitting.
+
+		</p>
+
+		<h3>Test Data</h3>
+		<p>
+			BLEU scores are evaluated based on the test data provided in Project 2.
+		</p>
+
+
+			<table>
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>English Input</th>
+						<th>Reference French Translation</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td>1</td><td>go .</td><td>va !</td></tr>
+					<tr><td>2</td><td>i lost .</td><td>j'ai perdu .</td></tr>
+					<tr><td>3</td><td>he's calm .</td><td>il est calme .</td></tr>
+					<tr><td>4</td><td>i'm home .</td><td>je suis chez moi .</td></tr>
+					<tr><td>5</td><td>she likes coffee .</td><td>elle aime le café .</td></tr>
+					<tr><td>6</td><td>they are reading books .</td><td>ils lisent des livres .</td></tr>
+					<tr><td>7</td><td>we are running .</td><td>nous courons .</td></tr>
+					<tr><td>8</td><td>where is the library ?</td><td>où est la bibliothèque ?</td></tr>
+					<tr><td>9</td><td>the weather is nice today .</td><td>il fait beau aujourd'hui .</td></tr>
+					<tr><td>10</td><td>he enjoys playing soccer .</td><td>il aime jouer au football .</td></tr>
+					<tr><td>11</td><td>i will call you later .</td><td>je t'appellerai plus tard .</td></tr>
+					<tr><td>12</td><td>do you like music ?</td><td>aimes-tu la musique ?</td></tr>
+					<tr><td>13</td><td>my favorite color is blue .</td><td>ma couleur préférée est le bleu .</td></tr>
+					<tr><td>14</td><td>i don't understand .</td><td>je ne comprends pas .</td></tr>
+					<tr><td>15</td><td>please help me .</td><td>aidez-moi s'il vous plaît .</td></tr>
+					<tr><td>16</td><td>what time is it ?</td><td>quelle heure est-il ?</td></tr>
+					<tr><td>17</td><td>this is my brother .</td><td>c'est mon frère .</td></tr>
+					<tr><td>18</td><td>we love traveling .</td><td>nous aimons voyager .</td></tr>
+					<tr><td>19</td><td>he went to school .</td><td>il est allé à l'école .</td></tr>
+					<tr><td>20</td><td>she speaks three languages .</td><td>elle parle trois langues .</td></tr>
+				</tbody>
+			</table>
+
+
 	</section>
 
 	<section class="section-title">
 		<h2>Part 1: Basic Attention Mechanism</h2>
 	</section>
 
+	<section class = "card">
+		<h3>Model Architecture</h3>
+		<p>
+			Part 1 uses the Bahdanau (additive) attention decoder.
+			The encoder is a stacked GRU (Seq2SeqEncoder) with token embeddings and
+			Xavier initialization. It outputs the full source hidden-state sequence
+			(shape: <code>num_steps x batch_size x num_hiddens</code>) and final hidden state.
+			The decoder (Seq2SeqBahdanauDecoder) is also GRU-based and decodes one token at a time.
+			At each target step, it uses the top decoder hidden state as the query,
+			attends over all encoder outputs, concatenates context with the current target embedding,
+			and feeds that into the GRU before projecting with a linear layer to vocabulary logits.
+		</p>
+		<h4>How Attention is Computed (Additive / Bahdanau)</h4>
+		<p>
+			For each decoding step, with decoder query q and encoder keys/values k,v, the model computes:
+			<code>score = W_v(tanh(W_q q + W_k k))</code>, then applies masked softmax across source positions
+			(using source valid lengths to ignore padding), and forms context by weighted sum:
+			<code>context = softmax(score) x v</code>.
+			Dropout is applied to attention weights before the weighted sum.
+		</p>
+	</section>
+
 	<section class="card">
 		<h3>Task 1: Hyperparameter Tuning</h3>
 		<p>
-			I tuned the attention-based encoder-decoder to maximize BLEU score while
-			maintaining stable convergence.
+			I tuned the hyperparameters of the attention-based encoder-decoder with the aim to maximize BLEU score. 
 		</p>
 
-		<h4>Top Configurations (at least 3)</h4>
+
+		<h4>Top 3 Configurations by BLEU Score</h4>
 		<table>
 			<thead>
 				<tr>
 					<th>Config</th>
-					<th>Epochs</th>
+					<th>Embed Size</th>
 					<th>Hidden Size</th>
-					<th>Learning Rate</th>
+					<th>Num. Layers</th>
 					<th>Dropout</th>
-					<th>Best Val Loss</th>
+					<th>Learning Rate</th>
+					<th>Batch Size</th>
 					<th>BLEU</th>
-					<th>Notes</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr><td>A</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
-				<tr><td>B</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
-				<tr><td>C</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+				<tr><td>B</td><td>256</td><td>256</td><td>2</td><td>0.10</td><td>0.0030</td><td>128</td><td>0.1829</td></tr>
+				<tr><td>E</td><td>256</td><td>256</td><td>2</td><td>0.20</td><td>0.0015</td><td>64</td><td>0.1829</td></tr>
+				<tr><td>I</td><td>256</td><td>256</td><td>2</td><td>0.25</td><td>0.0030</td><td>256</td><td>0.1801</td></tr>
 			</tbody>
 		</table>
 
 		<h4>Loss Curves</h4>
 		<div class="figure-grid">
 			<figure>
-				<div class="img-placeholder">Insert screenshot: Part 1 Config A train/val loss</div>
-				<figcaption>Figure 1. Basic attention (Config A) loss curves.</figcaption>
+				<div class="img-placeholder"><img src = "images/configB_1.svg" alt="Config B Loss Curves"></div>
+				<figcaption>Figure 1. Basic attention (Config B) loss curves.</figcaption>
 			</figure>
 			<figure>
-				<div class="img-placeholder">Insert screenshot: Part 1 Config B train/val loss</div>
-				<figcaption>Figure 2. Basic attention (Config B) loss curves.</figcaption>
+				<div class="img-placeholder"><img src = "images/configE_1.svg" alt="Config E Loss Curves"></div>
+				<figcaption>Figure 2. Basic attention (Config E) loss curves.</figcaption>
 			</figure>
 			<figure>
-				<div class="img-placeholder">Insert screenshot: Part 1 Config C train/val loss</div>
-				<figcaption>Figure 3. Basic attention (Config C) loss curves.</figcaption>
+				<div class="img-placeholder"><img src = "images/configI_1.svg" alt="Config I Loss Curves"></div>
+				<figcaption>Figure 3. Basic attention (Config I) loss curves.</figcaption>
 			</figure>
 		</div>
 
@@ -150,21 +195,48 @@
 		<h3>Task 2: Attention Visualization</h3>
 		<p>
 			For selected sentence pairs, I visualize attention weights to inspect
-			alignment behavior between source and target tokens.
+			model behavior between source and target tokens. 
+
+			<div class="note-box">
+				<p><strong>Sentence pairs used for attention heatmaps:</strong></p>
+				<ul class="pair-list">
+					<li>go . - va !</li>
+					<li>where is the library ? - où est la bibliothèque ?</li>
+					<li>i will call you later . - je t'appellerai plus tard .</li>
+					<li>she speaks three languages . - elle parle trois langues .</li>
+				</ul>
+			</div>
+
 		</p>
 
 		<div class="figure-grid">
 			<figure>
-				<div class="img-placeholder">Insert screenshot: attention heatmap example 1</div>
+				<div class="img-placeholder"><img src = "images/1h_ATT-F1.png" alt="Attention Heatmap for Sentence Pair 1"></div>
 				<figcaption>Figure 4. Attention heatmap for sentence pair 1.</figcaption>
-			</figure>
+			</figure>					
+		</div>
+		<div class="figure-grid">
 			<figure>
-				<div class="img-placeholder">Insert screenshot: attention heatmap example 2</div>
+				<div class="img-placeholder"><img src = "images/1h_ATT-F2.png" alt="Attention Heatmap for Sentence Pair 2"></div>
 				<figcaption>Figure 5. Attention heatmap for sentence pair 2.</figcaption>
-			</figure>
+			</figure>					
+		</div>
+		<div class="figure-grid">
+			<figure>
+				<div class="img-placeholder"><img src = "images/1h_ATT-F3.png" alt="Attention Heatmap for Sentence Pair 3"></div>
+				<figcaption>Figure 6. Attention heatmap for sentence pair 3.</figcaption>
+			</figure>					
+		</div>		
+		<div class="figure-grid">
+			<figure>
+				<div class="img-placeholder"><img src = "images/1h_ATT-F4.png" alt="Attention Heatmap for Sentence Pair 4"></div>
+				<figcaption>Figure 7. Attention heatmap for sentence pair 4.</figcaption>
+			</figure>					
 		</div>
 
-		<h4>Interpretation</h4>
+
+
+		<h4>Discussion</h4>
 		<p>[Discuss what tokens the model attends to, and where alignments are weak.]</p>
 	</section>
 
@@ -172,43 +244,80 @@
 		<h2>Part 2: Multi-Head Attention</h2>
 	</section>
 
+	<section class = "card">
+		<h3>Model Architecture</h3>
+		<p>
+			Part 2 keeps the same GRU encoder-decoder backbone but replaces additive attention
+			with a multi-head scaled dot-product module.
+			The decoder (Seq2SeqMultiHeadDecoder) uses the current top decoder hidden state
+			as a single-step query and attends to encoder outputs as keys/values.
+			Inside the Multi-Head Attention module, q, k, v are linearly projected, split into heads,
+			processed in parallel, concatenated, and projected back to hidden size before GRU decoding.
+		</p>
+		<h4>How Attention is Computed (Multi-Head Scaled Dot-Product)</h4>
+		<p>
+			For each head h, the implementation computes scaled scores
+			<code>score_h = (Q_h K_h^T) / sqrt(d_k)</code>, applies masked softmax with source valid lengths,
+			then computes head context:  <code>context_h = softmax(score_h) x V_h</code>.
+			All head contexts are concatenated and passed through output projection <code>W_o</code>.
+			This is repeated at each decoder time step, and stacked to produce attention tensors
+			of shape <code>batch_size x num_heads x tgt_steps x src_steps</code>.
+		</p>
+	</section>
+
 	<section class="card">
 		<h3>Task 1: Implement and Compare Multi-Head Attention</h3>
 		<p>
 			I replaced single-head attention with multi-head attention and compared
 			optimization and translation quality against Part 1.
+			I used the two best hyperparameter configurations (Config B and Config E) from Part 1 as
+			baselines and varied the number of heads (1, 2, 4, 8) while keeping other settings constant. 
 		</p>
 
-		<h4>Head Count Study</h4>
+		<p>
+			The configurations only differ in batch size, dropout, and learning rate, so this allows us to see how multi-head attention interacts with these hyperparameters specifically, while still
+			controlling for other factors like embedding size, hidden size, and number of layers.
+		</p>
+
+
+		<h4>Head Count Study - Ordered by BLEU Score</h4>
 		<table>
 			<thead>
 				<tr>
 					<th>Heads</th>
-					<th>Train Loss (final)</th>
-					<th>Val Loss (best)</th>
+					<th>Config</th>
 					<th>BLEU</th>
-					<th>Runtime / Epoch</th>
-					<th>Notes</th>
+					<th>Dropout</th>
+					<th>LR</th>
+					<th>Batch Size</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr><td>1</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
-				<tr><td>2</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
-				<tr><td>4</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
-				<tr><td>8</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td><td>[ ]</td></tr>
+				<tr><td>4</td><td>B</td><td>0.1829</td><td>0.1</td><td>0.003</td><td>128</td></tr>
+				<tr><td>8</td><td>B</td><td>0.1829</td><td>0.1</td><td>0.003</td><td>128</td></tr>
+				<tr><td>2</td><td>B</td><td>0.1746</td><td>0.1</td><td>0.003</td><td>128</td></tr>
+				<tr><td>1</td><td>B</td><td>0.1500</td><td>0.1</td><td>0.003</td><td>128</td></tr>
+				<tr><td>1</td><td>E</td><td>0.1500</td><td>0.2</td><td>0.0015</td><td>64</td></tr>
+				<tr><td>2</td><td>E</td><td>0.1500</td><td>0.2</td><td>0.0015</td><td>64</td></tr>
+				<tr><td>4</td><td>E</td><td>0.1500</td><td>0.2</td><td>0.0015</td><td>64</td></tr>
+				<tr><td>8</td><td>E</td><td>0.1500</td><td>0.2</td><td>0.0015</td><td>64</td></tr>				
 			</tbody>
 		</table>
 
-		<h4>Training Curves</h4>
-		<div class="figure-grid">
-			<figure>
-				<div class="img-placeholder">Insert screenshot: multi-head train/val loss</div>
-				<figcaption>Figure 6. Multi-head attention loss curves.</figcaption>
-			</figure>
-			<figure>
-				<div class="img-placeholder">Insert screenshot: BLEU comparison bar chart</div>
-				<figcaption>Figure 7. BLEU comparison between Part 1 and Part 2.</figcaption>
-			</figure>
+		<h4>Training Curves - Configuration B (2 x 2 Grid)</h4>
+		<div class="curve-grid-4x4">
+			<figure><div class="img-placeholder"><img src="images/P2_CB_H1.svg" alt="Part 2 Config B Head = 1 Curves"></div><figcaption>Config B: Heads =  1</figcaption></figure>
+			<figure><div class="img-placeholder"><img src="images/P2_CB_H2.svg" alt="Part 2 Config B Head = 2 Curves"></div><figcaption>Config B: Heads =  2</figcaption></figure>
+			<figure><div class="img-placeholder"><img src="images/P2_CB_H4.svg" alt="Part 2 Config B Head = 4 Curves"></div><figcaption>Config B: Heads =  4</figcaption></figure>
+			<figure><div class="img-placeholder"><img src="images/P2_CB_H8.svg" alt="Part 2 Config B Head = 8 Curves"></div><figcaption>Config B: Heads =  8</figcaption></figure>
+		</div>
+
+		<h4>Training Curves - Configuration E (2 x 2 Grid)</h4>
+		<div class="curve-grid-4x4">
+			<figure><div class="img-placeholder"><img src="images/P2_CE_H1.svg" alt="Part 2 Config E Head = 1 Curves"></div><figcaption>Config E: Heads =  1</figcaption></figure>
+			<figure><div class="img-placeholder"><img src="images/P2_CE_H2.svg" alt="Part 2 Config E Head = 2 Curves"></div><figcaption>Config E: Heads =  2</figcaption></figure>
+			<figure><div class="img-placeholder"><img src="images/P2_CE_H4.svg" alt="Part 2 Config E Head = 4 Curves"></div><figcaption>Config E: Heads =  4</figcaption></figure>
+			<figure><div class="img-placeholder"><img src="images/P2_CE_H8.svg" alt="Part 2 Config E Head = 8 Curves"></div><figcaption>Config E: Heads =  8</figcaption></figure>
 		</div>
 
 		<h4>Discussion</h4>
@@ -219,32 +328,80 @@
 		<h3>Task 2: Analysis of Attention Heads</h3>
 		<p>
 			To examine specialization across heads, I visualize per-head attention
-			maps for translated sentence pairs and compare diversity versus overlap.
+			maps in a 4-head model for translated sentence pairs and compare diversity versus overlap.
 		</p>
 
-		<div class="figure-grid">
-			<figure>
-				<div class="img-placeholder">Insert screenshot: per-head heatmaps example 1</div>
-				<figcaption>Figure 8. Attention maps per head for sentence pair 1.</figcaption>
+		<div class="note-box">
+			<p><strong>Sentence pairs used for per-head heatmaps:</strong></p>
+			<ul class="pair-list">
+				<li>go . - va !</li>
+				<li>where is the library ? - où est la bibliothèque ?</li>
+				<li>i will call you later . - je t'appellerai plus tard .</li>
+				<li>she speaks three languages . - elle parle trois langues .</li>
+			</ul>
+		</div>
+
+		<h4>Sentence Pair 1: go . -> va !</h4>
+		<div class="figure-grid attention-stack">
+			<figure class="full-width">
+				<div class="img-placeholder"><img src="images/P2_AllH_FIG1.png" alt="Part 2 All Heads Attention Figure 1"></div>
+				<figcaption>Figure 8. Per-head attention maps for sentence pair 1.</figcaption>
 			</figure>
-			<figure>
-				<div class="img-placeholder">Insert screenshot: per-head heatmaps example 2</div>
-				<figcaption>Figure 9. Attention maps per head for sentence pair 2.</figcaption>
+		</div>
+		<div class="figure-grid avg-attention">
+			<figure class="half-width">
+				<div class="img-placeholder"><img src="images/P2_AvgH_FIG1.png" alt="Part 2 Average Heads Attention Figure 1"></div>
+				<figcaption>Figure 9. Average attention map across heads for sentence pair 1.</figcaption>
 			</figure>
 		</div>
 
-		<h4>Interpretation</h4>
+		<h4>Sentence Pair 2: where is the library ? -> où est la bibliothèque ?</h4>
+		<div class="figure-grid attention-stack">
+			<figure class="full-width">
+				<div class="img-placeholder"><img src="images/P2_AllH_FIG2.png" alt="Part 2 All Heads Attention Figure 2"></div>
+				<figcaption>Figure 10. Per-head attention maps for sentence pair 2.</figcaption>
+			</figure>
+		</div>
+		<div class="figure-grid avg-attention">
+			<figure class="half-width">
+				<div class="img-placeholder"><img src="images/P2_AvgH_FIG2.png" alt="Part 2 Average Heads Attention Figure 2"></div>
+				<figcaption>Figure 11. Average attention map across heads for sentence pair 2.</figcaption>
+			</figure>
+		</div>
+
+		<h4>Sentence Pair 3: i will call you later . -> je t'appellerai plus tard .</h4>
+		<div class="figure-grid attention-stack">
+			<figure class="full-width">
+				<div class="img-placeholder"><img src="images/P2_AllH_FIG3.png" alt="Part 2 All Heads Attention Figure 3"></div>
+				<figcaption>Figure 12. Per-head attention maps for sentence pair 3.</figcaption>
+			</figure>
+		</div>
+		<div class="figure-grid avg-attention">
+			<figure class="half-width">
+				<div class="img-placeholder"><img src="images/P2_AvgH_FIG3.png" alt="Part 2 Average Heads Attention Figure 3"></div>
+				<figcaption>Figure 13. Average attention map across heads for sentence pair 3.</figcaption>
+			</figure>
+		</div>
+
+		<h4>Sentence Pair 4: she speaks three languages . -> elle parle trois langues .</h4>
+		<div class="figure-grid attention-stack">
+			<figure class="full-width">
+				<div class="img-placeholder"><img src="images/P2_AllH_FIG4.png" alt="Part 2 All Heads Attention Figure 4"></div>
+				<figcaption>Figure 14. Per-head attention maps for sentence pair 4.</figcaption>
+			</figure>
+		</div>
+		<div class="figure-grid avg-attention">
+			<figure class="half-width">
+				<div class="img-placeholder"><img src="images/P2_AvgH_FIG4.png" alt="Part 2 Average Heads Attention Figure 4"></div>
+				<figcaption>Figure 15. Average attention map across heads for sentence pair 4.</figcaption>
+			</figure>
+		</div>
+
+		<h4>Discussion</h4>
 		<p>[Discuss whether heads capture distinct patterns or exhibit redundancy.]</p>
 	</section>
 
-	<section class="card">
-		<h2>Transformer Extension (Optional / Bonus)</h2>
-		<p>
-			If implemented, summarize how the full Transformer compares with
-			attention-based RNN variants in BLEU, speed, and qualitative outputs.
-		</p>
-		<p>[Add results here if applicable.]</p>
-	</section>
+
 
 	<section class="card">
 		<h2>Final Reflection</h2>

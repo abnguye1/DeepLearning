@@ -121,10 +121,12 @@ h5 {
 
 .card h2 {
     font-size: clamp(1.45rem, 3vw, 2.1rem);
+    margin-bottom: 20px;
 }
 
 .card h3 {
     font-size: clamp(1.22rem, 2.5vw, 1.65rem);
+    margin-bottom: 20px;
 }
 
 p,
@@ -146,10 +148,11 @@ li {
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
     overflow: hidden;
-    border-radius: 10px;
+    margin: 14px 0;
 }
+
+
 
 th,
 td {
@@ -172,6 +175,62 @@ th {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
+.figure-grid.two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.figure-grid.attention-stack {
+    grid-template-columns: 1fr;
+    margin-bottom: 6px;
+}
+
+.figure-grid.avg-attention {
+    grid-template-columns: 1fr;
+    max-width: 50%;
+    margin-bottom: 20px;
+}
+
+figure.full-width {
+    width: 100%;
+}
+
+figure.half-width {
+    width: 100%;
+}
+
+.curve-grid-4x4 {
+    margin-top: 12px;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.curve-grid-4x4 figure figcaption {
+    margin-top: 8px;
+    text-align: center;
+}
+
+.note-box {
+    margin: 14px 0;
+    padding: 12px 14px;
+    border: 1px solid #675682;
+    border-radius: 10px;
+    background: rgba(28, 20, 44, 0.75);
+}
+
+.note-box p {
+    margin: 0 0 6px;
+}
+
+.pair-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.pair-list li {
+    line-height: 1.5;
+}
+
 figure {
     margin: 0;
 }
@@ -189,8 +248,14 @@ figure {
     padding: 16px;
 }
 
+img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+}
+
 figcaption {
-    margin-top: 8px;
+    margin: 10px;
     color: var(--text-muted);
     font-size: 0.9rem;
 }
@@ -235,8 +300,26 @@ figcaption {
         padding: 8px;
     }
 
+    .test-data-table {
+        min-width: 560px;
+    }
+
+    .figure-grid.two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .curve-grid-4x4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .site-footer {
         margin: 0 18px;
         padding-bottom: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .curve-grid-4x4 {
+        grid-template-columns: 1fr;
     }
 }
