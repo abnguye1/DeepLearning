@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project 3 | Attention and Transformer Analysis</title>
+<title>Project 3 | Attention Analysis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
@@ -349,12 +349,13 @@
 			optimization and translation quality against Part 1.
 			I used the two best hyperparameter configurations (Config B and Config E) from Part 1 as
 			baselines and varied the number of heads (1, 2, 4, 8) while keeping other settings constant. 
+			Both configurations had BLEU scores of 0.1829.
 		</p>
 
 		<p>
 			The configurations only differ in batch size, dropout, and learning rate, so this allows us to see
 			 how multi-head attention interacts with these hyperparameters specifically, while still
-			controlling for other factors like embedding size, hidden size, and number of layers.
+			controlling for other factors like embedding size, hidden size, and number of layers. 
 		</p>
 
 
@@ -382,7 +383,7 @@
 			</tbody>
 		</table>
 
-		<h4>Training Curves - Configuration B (2 x 2 Grid)</h4>
+		<h4>Training Curves - Configuration B</h4>
 		<div class="curve-grid-4x4">
 			<figure><div class="img-placeholder"><img src="images/P2_CB_H1.svg" alt="Part 2 Config B Head = 1 Curves"></div><figcaption>Config B: Heads =  1</figcaption></figure>
 			<figure><div class="img-placeholder"><img src="images/P2_CB_H2.svg" alt="Part 2 Config B Head = 2 Curves"></div><figcaption>Config B: Heads =  2</figcaption></figure>
@@ -390,7 +391,7 @@
 			<figure><div class="img-placeholder"><img src="images/P2_CB_H8.svg" alt="Part 2 Config B Head = 8 Curves"></div><figcaption>Config B: Heads =  8</figcaption></figure>
 		</div>
 
-		<h4>Training Curves - Configuration E (2 x 2 Grid)</h4>
+		<h4>Training Curves - Configuration E</h4>
 		<div class="curve-grid-4x4">
 			<figure><div class="img-placeholder"><img src="images/P2_CE_H1.svg" alt="Part 2 Config E Head = 1 Curves"></div><figcaption>Config E: Heads =  1</figcaption></figure>
 			<figure><div class="img-placeholder"><img src="images/P2_CE_H2.svg" alt="Part 2 Config E Head = 2 Curves"></div><figcaption>Config E: Heads =  2</figcaption></figure>
@@ -400,13 +401,22 @@
 
 		<h4>Discussion</h4>
 		<p>
-			Multi-head attention demonstrates conditional gains over single-head attention, with performance strongly dependent on the underlying hyperparameter configuration. Under the strong Config B setting (dropout=0.1, lr=0.003, bs=128), increasing head count from 1 to 4–8 improved BLEU from 0.1500 to 0.1829 (a 22% gain), matching the Part 1 single-head baseline. In contrast, under the weaker Config E setting (dropout=0.2, lr=0.0015, bs=64), all head counts yielded the same BLEU of 0.1500, indicating that head count provides no benefit when the underlying hyperparameters themselves are not ideal.
+			Multi-head attention demonstrates conditional gains over single-head attention, with performance strongly 
+			dependent on the underlying hyperparameter configuration. Under the strong Config B setting (dropout=0.1, lr=0.003, bs=128), 
+			increasing head count from 1 to 4–8 improved BLEU from 0.1500 to 0.1829 (a 22% gain), matching the Part 1 single-head baseline. 
+			In contrast, under the weaker Config E setting (dropout=0.2, lr=0.0015, bs=64), all head counts yielded the same BLEU of 0.1500, 
+			indicating that head count provides no benefit when the underlying hyperparameters themselves are not ideal.
 		</p>
 		<p>
-			This pattern suggests that multi-head attention requires a well-tuned learning rate and regularization schedule to be effective. Increasing model capacity (via heads) cannot compensate for poor optimization and the benefits of multi-head attention are contingent on suitable training dynamics and architecture, which may depend on the dataset size and complexity.
+			This pattern suggests that multi-head attention requires a well-tuned learning rate and regularization schedule to be effective. 
+			Increasing model capacity (via heads) cannot compensate for poor optimization and the benefits of multi-head attention are contingent 
+			on suitable training dynamics and architecture, which may depend on the dataset size and complexity.
 		</p>
 		<p>
-			The training curves show that Config B configurations with 4+ heads converge smoothly, while Config E exhibits slower or plateau-like convergence regardless of head count, reinforcing the dominance of base hyperparameters. Notably, the best Part 2 BLEU (0.1829) exactly matches the best Part 1 BLEU, indicating that improving the underlying optimization is at least as important as architectural complexity for this low-resource translation task.
+			The training curves show that Config B configurations with 4+ heads converge smoothly, while Config E exhibits 
+			slower or plateau-like convergence regardless of head count, reinforcing the dominance of base hyperparameters. 
+			Notably, the best Part 2 BLEU (0.1829) exactly matches the best Part 1 BLEU, indicating that improving the underlying 
+			optimization is at least as important as architectural complexity for this low-resource translation task.
 		</p>
 	</section>
 
