@@ -215,7 +215,7 @@
             <strong>Range [-1, 1]:</strong> Nearly every decoded point produces a recognizable digit. Neighboring grid positions yield smoothly morphing shapes (a "3" gradually becomes an "8" as you move horizontally). This smooth behavior is the goal of the VAE's structured latent space.
         </p>
         <p>
-            <strong>Range [-5, 5]:</strong> Moving beyond ±2, images become blurry and ambiguous. At the extremes (±5), outputs are nearly blank or unrecognizable. This degradation occurs because the encoder concentrates around z=0 (where the prior has high density), so far-away regions were rarely seen during training.
+            <strong>Range [-5, 5]:</strong> Moving beyond ±2, images become blurry and ambiguous. At the extremes (±5), outputs are nearly blank or unrecognizable. This degradation occurs because the encoder concentrates around z=0 (where the prior has high density), so far away regions were rarely seen during training.
         </p>
         <p>
             The key difference is that the [-1, 1] range is densely populated by the encoder, while [-5, 5] includes sparsely visited territory. The VAE works well where it has learned, and poorly where it hasn't.
@@ -337,7 +337,7 @@
         <h4>Experiment Design</h4>
         <p>
             Two axes were tested: activation behavior in <code>D</code> (LeakyReLU vs ReLU) and optimization sensitivity
-            (high learning rate and different negative slopes). Evaluation combines curve-level diagnostics and visual sample quality,
+            (high learning rate and different negative slopes). Evaluation combines curve level diagnostics and visual sample quality,
             so conclusions are not based on loss values alone.
         </p>
 
@@ -357,7 +357,7 @@
                     <td>0.3891</td>
                     <td>4.4282</td>
                     <td>0.861</td>
-                    <td>Stable baseline, but discriminator-dominant at the end.</td>
+                    <td>Stable baseline, but discriminator dominant at the end.</td>
                 </tr>
                 <tr>
                     <td>ReLU in discriminator</td>
@@ -423,13 +423,13 @@
         <p>
             High learning rate (<code>10<sup>-3</sup></code>) caused severe mode collapse: samples became nearly monochrome gray blobs with no recognizable sprite structure.
             Despite bounded loss curves, the generator essentially learned to output average pixel values across all Pokemon, canceling out colors.
-            Low slope (<code>a=0.05</code>) triggered the opposite problem—extreme mode collapse where the same face-like structure repeated across the entire grid with minimal diversity,
+            Low slope (<code>a=0.05</code>) triggered the opposite problem: extreme mode collapse. This appears in the same face-like structure repeated across the entire grid with minimal diversity,
             reflecting the "dying ReLU" problem where the discriminator became too powerful. High slope (<code>a=0.30</code>) performed best with colorful, diverse sprites,
             the lowest final generator loss (<code>L_G ≈ 2.88</code>), and smoothest loss curves without late-epoch instability.
         </p>
         <p>
             These results clearly demonstrate that learning rate and leaky slope directly determine whether the generator maintains diversity or collapses.
-            Most critically, loss metrics alone cannot detect mode collapse—bounded, smooth loss curves can coincide with catastrophic visual degradation.
+            Most critically, loss metrics alone cannot detect mode collapse, as bounded, smooth loss curves can coincide with catastrophic visual degradation.
             Comprehensive evaluation requires both quantitative metrics and visual inspection of generated samples.
         </p>
 
