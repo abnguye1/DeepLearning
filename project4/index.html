@@ -421,9 +421,9 @@
 
         <h4>Discussion</h4>
         <p>
-            High learning rate (<code>10<sup>-3</sup></code>) caused severe mode collapse: samples became nearly monochrome gray blobs with no recognizable sprite structure.
-            Despite bounded loss curves, the generator essentially learned to output average pixel values across all Pokemon, canceling out colors.
-            Low slope (<code>a=0.05</code>) triggered the opposite problem: extreme mode collapse. This appears in the same face-like structure repeated across the entire grid with minimal diversity,
+            High learning rate (<code>10<sup>-3</sup></code>) caused severe mode collapse: samples became nearly monochrome gray blobs.
+            Despite bounded loss curves, the generator seems to have learned to output average pixel values across all Pokemon, canceling out colors.
+            Low slope (<code>a=0.05</code>) also resulted in mode collapse, but in a different way. This appears in the same face-like structure repeated across the entire grid with minimal diversity,
             reflecting the "dying ReLU" problem where the discriminator became too powerful. High slope (<code>a=0.30</code>) performed best with colorful, diverse sprites,
             the lowest final generator loss (<code>L_G ≈ 2.88</code>), and smoothest loss curves without late-epoch instability.
         </p>
