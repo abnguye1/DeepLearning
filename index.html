@@ -3,53 +3,462 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deep Learning Project Reports</title>
+<title>Project 4 | Generative Models</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="project4.css">
 </head>
-
 <body>
 
 <header class="hero">
-<p class="eyebrow">Deep Learning Journal</p>
-<h1>Project Reports</h1>
-<p class="subtitle">Andrew Nguyen | <a class = "subtitle" href="https://github.com/abnguye1" target="_blank">github.com/abnguye1 (DL)</a> | <a class = "subtitle" href="https://github.com/rainbao" target="_blank">github.com/rainbao</a> | Spring 2026</p>
+    <p class="eyebrow">Deep Learning Project 4</p>
+    <h1>Generative Models: Autoencoder, VAE, and GAN</h1>
+    <p class="subtitle">Andrew Nguyen | Spring 2026</p>
+    <div class="hero-links">
+        <a href="../index.html">Back to Landing Page</a>
+        <a href="../../project4/instructions.md" target="_blank" rel="noopener noreferrer">Project Instructions</a>
+    </div>
 </header>
 
-<main class="blog-container">
+<main class="container">
+    <section class="card lead-card">
+        <h2>Objective</h2>
+        <p>
+            This project studies three generative-model ideas from class in a single narrative:
+            deterministic reconstruction (Autoencoder), probabilistic latent modeling (VAE),
+            and adversarial synthesis (DCGAN).
+        </p>
+
+        <p>
+            Part 1 explores how latent-space structure affects reconstruction and generation quality,
+            while Part 2 focuses on training dynamics and stability in GANs.
+        </p>
+    </section>
+
+    <section class="section-title">
+        <h2>Part 1: Autoencoder and VAE</h2>
+    </section>
+
+    <section class="card">
+        <h3>Task 1: Implement and analyze a basic autoencoder.</h3>
+        <p>
+            I trained three fully-connected autoencoders with latent dimensions 2, 8, and 32 on MNIST.
+            This section asks two questions: how latent capacity affects reconstruction, and whether
+            plain autoencoder latent spaces are valid for random generation.
+        </p>
+
+        <h4>Model Architecture</h4>
+        <p>
+            The autoencoder uses a deterministic encoder-decoder pipeline.
+            The encoder compresses a <code>28 x 28</code> image to a latent code <code>z</code>, and the decoder maps
+            <code>z</code> back to pixel space. Training minimizes MSE reconstruction loss, so optimization focuses
+            on preserving input detail rather than shaping latent-space probability geometry.
+        </p>
+
+        <h4>Sample Inputs</h4>
+        <figure>
+            <img src="images/p1_mnist_samples.png" alt="Sample MNIST digits used in Part 1 experiments">
+            <figcaption>Figure 1. Sample MNIST inputs used for reconstruction and generation analysis.</figcaption>
+        </figure>
 
 
-<a class="post-card" href="project2/" style="--delay: 0.3s;">
-<p class="tag">Basic RNN</p>
-<h2>Project 2: Modern Recurrent Neural Networks</h2>
-<p>
-Implementation and experimentation with RNN architectures
-including gradient clipping and activation function analysis.
-</p>
-<div class="card-footer">
-<span class="date">Spring 2026</span>
-</div>
-</a>
+        <h4>Results Figures</h4>
+        <div class="figure-grid">
+            <figure>
+                <img src="images/p1_ae_loss.png" alt="Autoencoder train and validation loss curves for latent dimensions 2, 8, and 32">
+                <figcaption>Figure 2. Autoencoder training and validation MSE across latent dimensions.</figcaption>
+            </figure>
+        </div>
+
+        <h4>Reconstruction Quality Across Latent Dimensions</h4>
+        <figure>
+            <img src="images/p1_ae_recon.png" alt="Autoencoder reconstructions comparing original digits and latent dimensions 2, 8, and 32">
+            <figcaption>Figure 3. Reconstruction quality comparison: originals vs AE (LD=2, 8, 32).</figcaption>
+        </figure>
+
+        <h4>Observations</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Latent Dim</th>
+                    <th>Final Test MSE</th>
+                    <th>Observation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>2</td><td>0.03614</td><td>Blurry reconstructions and lost stroke detail due to severe compression.</td></tr>
+                <tr><td>8</td><td>0.01436</td><td>Digit structure is mostly preserved, with moderate smoothing.</td></tr>
+                <tr><td>32</td><td>0.00496</td><td>Best reconstruction fidelity and sharpest digit boundaries.</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Discussion: How Latent Dimensionality Affects Reconstruction</h4>
+        <p>
+            The figures demonstrate a clear relationship: larger latent dimensions dramatically improve reconstruction quality.
+        </p>
+        <p>
+            <strong>LD=2:</strong> With only 2 numbers to encode 784 pixel values, compression is severe. Reconstructions are quite blurry and digit shapes are not accurately recovered. This extreme compression causes significant information loss, evident in the final MSE of 0.03614.
+        </p>
+        <p>
+            <strong>LD=8:</strong> Eight latent dimensions provide enough capacity to capture the primary visual structure of most digits. Reconstructions are recognizable and reasonably sharp. The model can distinguish similar-looking digits (4 vs 9, 3 vs 8) better than LD=2. Test MSE drops to 0.01436, showing substantial improvement with just a 4x increase in dimensions.
+        </p>
+        <p>
+            <strong>LD=32:</strong> With 32 dimensions, the autoencoder approaches near-perfect reconstruction. Shape and details are preserved. Test MSE is 0.00496—more than 7x lower than LD=2. This demonstrates a clear relationship between reconstruction quality and latent dimensionality.
+        </p>
+
+        <h4>Random Sampling from Learned Latent Space</h4>
+        <figure>
+            <img src="images/p1_ae_sampling.png" alt="Random generations from autoencoder latent spaces with dimensions 8 and 32">
+            <figcaption>Figure 4. AE random sampling from z ~ N(0, I) for LD=8 and LD=32.</figcaption>
+        </figure>
+
+        <h4>Discussion: Sampling Quality and Latent Space Structure</h4>
+        <p>
+            Reconstruction and generation tell different stories. Both LD=8 and LD=32 produce largely incoherent outputs when random vectors are decoded.
+        </p>
+        <p>
+            During training, the encoder learns to map inputs to points in the latent space. All 0s might cluster near one location, all 1s near another. These clusters are separated by empty spaces, which don't carry any meaning. When we sample random z from N(0, I), it's likely that we'll have to sample from this empty space. The decoder has been trained to reconstruct digits, so with randomly sampled points in empty space, the decoder is likely to output nonsense.
+        </p>
+        <p>
+            Interestingly, LD=32 actually performs worse than LD=8 for random generation. With 32 dimensions, the latent space becomes significantly larger. Since this space is larger, the clusters of points corresponding to the actual digits become less likely to sample from. With more "empty space" being sampled from, we find ourselves much more likely to generate nonsense. So while LD=32 excels at reconstruction through capacity, it performs worse for generation.
+        </p>
+    </section>
+
+    <section class="card">
+        <h3>Task 2:  Implement and analyze VAE.</h3>
+        <p>
+            I implemented a VAE with reparameterization and ELBO loss (BCE + KL divergence),
+            trained with latent_dim = 2 which makes the latent-space more visualizable. This section explores how the VAE's structured latent space enables reliable sampling, even with a low-dimensional bottleneck, and how the ELBO loss balances reconstruction and regularization.
+        </p>
+
+        <h4>Model Architecture and Learning Objective</h4>
+        <p>
+            Unlike AE, the VAE encoder predicts <code>mu(x)</code> and <code>log sigma^2(x)</code> for a Gaussian posterior.
+            Latent samples are generated as <code>z = mu + sigma * epsilon</code>, where <code>epsilon ~ N(0, I)</code>.
+            Training uses a two-part loss: one term measures reconstruction accuracy, the other measures how well the encoder's distribution
+            aligns with a standard Gaussian. This dual objective forces the model to learn both meaningful reconstructions and
+            a latent space that follows a predictable structure.
+        </p>
+
+        <h4>VAE Training Checkpoints (ELBO)</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Epoch</th>
+                    <th>Train Loss</th>
+                    <th>Test Loss</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>5</td><td>149.0</td><td>147.5</td></tr>
+                <tr><td>10</td><td>143.6</td><td>143.2</td></tr>
+                <tr><td>15</td><td>140.9</td><td>140.8</td></tr>
+                <tr><td>20</td><td>139.2</td><td>139.8</td></tr>
+                <tr><td>25</td><td>138.2</td><td>138.8</td></tr>
+                <tr><td>30</td><td>137.3</td><td>138.0</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Training Progress</h4>
+        <figure>
+            <img src="images/p1_vae_loss.png" alt="VAE ELBO training and test loss curves over 30 epochs">
+            <figcaption>Figure 5. VAE ELBO loss progression.</figcaption>
+        </figure>
 
 
+        <h4>Random Sampling Quality</h4>
+        <figure>
+            <img src="images/p1_sample_compare.png" alt="Random sample comparison between AE latent dimensions 8 and 32 and VAE latent dimension 2">
+            <figcaption>Figure 7. Random generation comparison: AE (LD=8/32) vs VAE (LD=2).</figcaption>
+        </figure>
 
-<a class="post-card" href="project3/" style="--delay: 0.3s;">
-<p class="tag">Attention Mechanisms</p>
-<h2>Project 3: Attention and Transformers</h2>
-<p>
-Implementation and experimentation with attention mechanisms in RNN encoder-decoder models. Analysis of basic attention and multi-head attention. 
-</p>
-<div class="card-footer">
-<span class="date">Spring 2026</span>
-</div>
-</a>
+        <h4>Discussion: Sampling in VAE vs AE</h4>
+        <p>
+            <strong>AE (LD=8 and LD=32):</strong> Random samples from N(0, I) produce incoherent blobs with no recognizable digit structure. LD=32 actually performs worse than LD=8 because the exponentially larger volume of latent space means random vectors are even less likely to land in regions the decoder has seen during training.
+        </p>
+        <p>
+            <strong>VAE (LD=2):</strong> Despite using only 2 latent dimensions, the VAE's random samples produce clearly recognizable digits. The VAE's regularization spreads learned data across the entire unit Gaussian, so any random sample decodes into something meaningful.
+        </p>
+        <p>
+            VAE success comes from the structure of the latent space. The VAE creates a smooth, continuous structure, while the AE creates a sparse, discontinuous latent space. Similar inputs are close together with "filled" spaces, preventing issues that cause nonsensical outputs.
+        </p>
 
+        <h4>Latent Space Organization</h4>
+        <figure>
+            <img src="images/p1_latent_scatter.png" alt="Two-dimensional VAE latent scatter plot with digit classes">
+            <figcaption>Figure 8. VAE latent means on the test set (2D embedding).</figcaption>
+        </figure>
+
+        <h4>Discussion: Learned Digit Clustering</h4>
+        <p>
+            Digits cluster into distinct regions in 2D latent space. Visually similar digits (4 and 9, 3 and 8) are positioned close together, while more distinct digits (1 and 0) are far apart. This organized structure emerges without explicit labeling and enables the smooth generation behavior we see in VAE sampling.
+        </p>
+
+        <h4>Latent Grid Visualizations</h4>
+        <div class="figure-grid two-col">
+            <figure>
+                <img src="images/p1_latent_grid_small.png" alt="VAE latent grid decoded over range minus 1 to 1">
+                <figcaption>Figure 9. Decoded VAE latent grid for z in [-1, 1] (high-density region).</figcaption>
+            </figure>
+            <figure>
+                <img src="images/p1_latent_grid_large.png" alt="VAE latent grid decoded over range minus 5 to 5">
+                <figcaption>Figure 10. Decoded VAE latent grid for z in [-5, 5] (includes low-density boundary).</figcaption>
+            </figure>
+        </div>
+
+        <h4>Discussion: VAE Latent Space Visualizations</h4>
+        <p>
+            Comparing the two ranges reveals how the VAE's learned structure varies across the latent space.
+        </p>
+        <p>
+            <strong>Range [-1, 1]:</strong> Nearly every decoded point produces a recognizable digit. Neighboring grid positions yield smoothly morphing shapes (a "3" gradually becomes an "8" as you move horizontally). This smooth behavior is the goal of the VAE's structured latent space.
+        </p>
+        <p>
+            <strong>Range [-5, 5]:</strong> Moving beyond ±2, images become blurry and ambiguous. At the extremes (±5), outputs are nearly blank or unrecognizable. This degradation occurs because the encoder concentrates around z=0 (where the prior has high density), so far-away regions were rarely seen during training.
+        </p>
+        <p>
+            The key difference is that the [-1, 1] range is densely populated by the encoder, while [-5, 5] includes sparsely visited territory. The VAE works well where it has learned, and poorly where it hasn't.
+        </p>
+    </section>
+
+    <section class="section-title">
+        <h2>Part 2: Deep Convolutional GAN</h2>
+    </section>
+
+    <section class="card">
+        <h3>Task 1: Implement a deep convolutional GAN.</h3>
+        <p>
+            I implemented a DCGAN with transposed convolution generator blocks and convolutional discriminator blocks.
+            Baseline training uses LeakyReLU in the discriminator, Adam optimization, and fixed-noise snapshots every 5 epochs.
+        </p>
+
+        <p>
+            We use the Pokemon sprite dataset, which contains 64x64 RGB images of various Pokemon characters. The goal is to train a GAN that can generate new, visually coherent Pokemon-like sprites. 
+        </p>
+
+        <h4>Sample Pokemon Sprites</h4>
+        <figure>
+            <img src="images/p2_pokemon_samples.png" alt="Sample Pokemon sprite images from the dataset">
+            <figcaption>Figure 8. Sample Pokemon sprites from the training dataset.</figcaption>
+        </figure>
+
+        <h4>Model Architecture</h4>
+        <p>
+            The generator maps latent noise <code>z</code> to <code>64 x 64</code> RGB sprites via
+            upsampling blocks (ConvTranspose2d + BatchNorm + ReLU), ending with <code>Tanh</code> output to match the [-1, 1] image range.
+            The discriminator applies a series of downsampling convolution blocks with BatchNorm and LeakyReLU activation,
+            ultimately outputting a single scalar probability for real vs. fake.
+        </p>
+        <p>
+            The choice of activation functions and normalization layers reflects decisions made during early GAN research to accelerate training.
+            We will explore how sensitive this architecture choice is through ablation.
+        </p>
+
+        <h4>Baseline Quantitative Summary</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Setting</th>
+                    <th>D Loss</th>
+                    <th>G Loss</th>
+                    <th>D(real)</th>
+                    <th>D(fake)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Baseline (LeakyReLU, a=0.20)</td><td>0.3891</td><td>4.4282</td><td>0.879</td><td>0.018</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Baseline Dynamics</h4>
+        <div class="figure-grid two-col">
+            <figure>
+                <img src="images/p2_baseline_dynamics.png" alt="Baseline DCGAN loss and discriminator confidence curves">
+                <figcaption>Figure 11. Baseline DCGAN dynamics: loss trajectories and discriminator confidence.</figcaption>
+            </figure>
+        </div>
+        <h4>Discussion</h4>
+        <p>
+            The baseline loss curves are oscillatory but bounded, which is typical for adversarial optimization.
+            Late in training, the large separation between discriminator outputs on real and fake images indicates
+            discriminator-dominant behavior rather than a fully balanced equilibrium.
+        </p>
+        <p>
+            This pattern is common when the discriminator learns faster local texture cues than the generator can match globally.
+            The run is still useful because optimization remains numerically stable and does not diverge,
+            but the confidence gap suggests that additional tuning is needed to reduce one-sided pressure on the generator.
+        </p>
+
+        <h4>Quality Progression Across Epochs</h4>
+        <div class="figure-grid two-col">
+            <figure>
+                <img src="images/p2_baseline_progression.png" alt="Baseline DCGAN fixed-noise snapshots across epochs">
+                <figcaption>Figure 12. Fixed-noise progression across baseline training epochs.</figcaption>
+            </figure>
+        </div>
+        <h4>Discussion</h4>
+        <p>
+            Snapshots taken every 5 epochs show a clear quality progression from coarse blobs to more coherent sprite structure.
+            Because the latent vectors are fixed, this improvement reflects learning progress rather than random sample variation.
+        </p>
+        <p>
+            The most informative transition is from mid to late epochs, where edge definition and color coherence improve together.
+            Early epochs mostly capture palette-level statistics; later epochs begin to model object-like boundaries and local anatomy,
+            which is the desired behavior for sprite synthesis.
+        </p>
+
+        <h4>Final Baseline Samples</h4>
+        <div class="figure-grid two-col">
+            <figure>
+                <img src="images/p2_baseline_grid.png" alt="Final baseline DCGAN generated sample grid">
+                <figcaption>Figure 13. Final baseline generated grid (64 samples).</figcaption>
+            </figure>
+        </div>
+        <h4>Discussion</h4>
+        <p>
+            The final baseline grid contains many recognizable Pokemon-like shapes but still shows uneven sharpness,
+            consistent with a stable yet imperfectly balanced GAN.
+        </p>
+        <p>
+            Diversity is present across pose, color, and silhouette, but quality is not uniformly distributed across all samples.
+            That unevenness is consistent with partial mode preference: the generator covers multiple visual modes,
+            yet some modes are clearly easier for it to render than others.
+        </p>
+    </section>
+
+    <section class="card">
+        <h3>Task 2: GAN Tuning and Evaluation</h3>
+        <p>
+            I compared discriminator activation choices and a small hyperparameter sweep.
+            The goal is to separate runs that only look stable numerically from runs that are both stable and visually diverse.
+        </p>
+
+        <h4>Experiment Design</h4>
+        <p>
+            Two axes were tested: activation behavior in <code>D</code> (LeakyReLU vs ReLU) and optimization sensitivity
+            (high learning rate and different negative slopes). Evaluation combines curve-level diagnostics and visual sample quality,
+            so conclusions are not based on loss values alone.
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Configuration</th>
+                    <th>Final D Loss</th>
+                    <th>Final G Loss</th>
+                    <th>D(real)-D(fake)</th>
+                    <th>Interpretation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Baseline (LeakyReLU, a=0.20)</td>
+                    <td>0.3891</td>
+                    <td>4.4282</td>
+                    <td>0.861</td>
+                    <td>Stable baseline, but discriminator-dominant at the end.</td>
+                </tr>
+                <tr>
+                    <td>ReLU in discriminator</td>
+                    <td>0.3426</td>
+                    <td>6.4315</td>
+                    <td>0.892</td>
+                    <td>Harder generator optimization and weaker adversarial balance.</td>
+                </tr>
+                <tr>
+                    <td>High LR (1e-3)</td>
+                    <td>0.3722</td>
+                    <td>4.7185</td>
+                    <td>0.875</td>
+                    <td>Did not explode, but diversity collapsed in quantitative proxies.</td>
+                </tr>
+                <tr>
+                    <td>Leaky slope a=0.05</td>
+                    <td>0.3449</td>
+                    <td>6.4796</td>
+                    <td>0.894</td>
+                    <td>Most unstable generator behavior late in training.</td>
+                </tr>
+                <tr>
+                    <td>Leaky slope a=0.30</td>
+                    <td>0.5749</td>
+                    <td>2.8818</td>
+                    <td>0.706</td>
+                    <td>Best overall run in this experiment set.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Activation Ablation</h4>
+        <div class="figure-grid two-col">
+            <figure>
+                <img src="images/p2_relu_ablation.png" alt="LeakyReLU vs ReLU discriminator ablation results">
+                <figcaption>Figure 14. Discriminator activation ablation: LeakyReLU vs ReLU.</figcaption>
+            </figure>
+        </div>
+
+        <h4>Discussion</h4>
+        <p>
+            Replacing LeakyReLU with standard ReLU produced significantly worse outcomes across both metrics and visuals.
+            The ReLU variant ended with higher generator loss (<code>L_G ≈ 6.43</code> vs <code>L_G ≈ 4.43</code>) and a larger discriminator confidence gap.
+            More importantly, the generated samples lost color diversity and showed less detailed sprite structure.
+            LeakyReLU samples remained colorful and coherent, while ReLU samples appeared washed out with reduced visual quality.
+        </p>
+        <p>
+            This demonstrates that activation choice directly impacts training dynamics and that loss curves alone can mask qualitative degradation.
+            The numerical scores looked reasonable, but the generated sprites clearly showed quality loss, highlighting why visual inspection
+            is essential for evaluating GAN training success.
+        </p>
+
+        <h4>Hyperparameter Sweep</h4>
+        <div class="figure-grid two-col">
+            <figure>
+                <img src="images/p2_hparam_grid.png" alt="Hyperparameter tuning comparison with loss curves and generated grids">
+                <figcaption>Figure 15. Hyperparameter tuning summary across baseline, high-LR, and slope variants.</figcaption>
+            </figure>
+        </div>
+
+        <h4>Discussion</h4>
+        <p>
+            High learning rate (<code>10<sup>-3</sup></code>) caused severe mode collapse: samples became nearly monochrome gray blobs with no recognizable sprite structure.
+            Despite bounded loss curves, the generator essentially learned to output average pixel values across all Pokemon, canceling out colors.
+            Low slope (<code>a=0.05</code>) triggered the opposite problem—extreme mode collapse where the same face-like structure repeated across the entire grid with minimal diversity,
+            reflecting the "dying ReLU" problem where the discriminator became too powerful. High slope (<code>a=0.30</code>) performed best with colorful, diverse sprites,
+            the lowest final generator loss (<code>L_G ≈ 2.88</code>), and smoothest loss curves without late-epoch instability.
+        </p>
+        <p>
+            These results clearly demonstrate that learning rate and leaky slope directly determine whether the generator maintains diversity or collapses.
+            Most critically, loss metrics alone cannot detect mode collapse—bounded, smooth loss curves can coincide with catastrophic visual degradation.
+            Comprehensive evaluation requires both quantitative metrics and visual inspection of generated samples.
+        </p>
+
+        <h4>Mode Collapse and Stability Issues</h4>
+        <p>
+            In settings with high learning rates, we observed that losses remained finite and seemed stable,
+            yet visual sample diversity degraded noticeably. A purely numeric view of training would have suggested success,
+            but careful inspection of generated samples revealed a covered pattern: restricted visual modes and repeated structures.
+        </p>
+        <p>
+            This highlights the importance of comprehensive evaluation: loss trajectories, discriminator behavior over time,
+            and most importantly, visual inspection of generated samples across multiple random seeds. A "stable" loss curve may coincide
+            with hidden failures that only appear in the actual outputs.
+        </p>
+    </section>
+
+    <section class="card">
+        <h2>Summary</h2>
+        <p>
+            AE and VAE experiments highlight the reconstruction-vs-sampling trade-off:
+            AE (large latent dim) reconstructs best, while VAE provides the most reliable random generation.
+            DCGAN produces visually coherent Pokemon-like sprites, but training quality is highly sensitive to activation and learning-rate choices.
+            In this run set, the strongest GAN configuration used LeakyReLU with slope <code>a=0.30</code>.
+        </p>
+    </section>
 </main>
 
 <footer class="site-footer">
-<p>© 2026 Andrew Nguyen</p>
+    <p>Project 4 report page · Generated from executed notebooks and curated analysis.</p>
 </footer>
 
 </body>
