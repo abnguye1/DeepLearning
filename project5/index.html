@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 5 | AI Agent for LaTeX Compression</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="project5.css">
+</head>
+<body>
+
+<header class="hero">
+    <p class="eyebrow">Deep Learning Project 5</p>
+    <h1>AI Agent for LaTeX Compression</h1>
+    <p class="subtitle">Andrew Nguyen | Spring 2026</p>
+    <div class="hero-links">
+        <a href="../index.html">Back to Landing Page</a>
+        <a href="../../project5/REQUIREMENTS.md" target="_blank" rel="noopener noreferrer">Project Requirements</a>
+    </div>
+</header>
+
+<main class="container">
+    <section class="card lead-card">
+        <h2>Objective</h2>
+        <p>
+            This project designs and implements an agentic AI pipeline that optimizes a LaTeX project by reducing its size while preserving visual quality. The primary goal is not the compression task itself, but to understand how to build structured workflows that use foundation models effectively under budget constraints.
+        </p>
+        <p>
+            The implementation targets Part 1 and Part 2 of the assignment: compress the project zip to under 50 MB, and the compiled PDF to under 30 MB, without sacrificing document readability.
+        </p>
+    </section>
+
+
+
+    <section class="card">
+         <h2>Problem Framing</h2>
+        <p>
+            Reducing file size is straightforward, but reducing it safely while keeping a document readable and visually credible is harder. The challenge is not to minimize size at all costs, but to:
+        </p>
+        <ul>
+            <li>Identify which files are junk (build artifacts, caches, duplicates).</li>
+            <li>Decide which images can be recompressed without losing legibility.</li>
+            <li>Test each change by recompiling and inspecting the output.</li>
+            <li>Know when to stop, even if the file could be smaller.</li>
+        </ul>
+        <p>
+            The workflow is designed to be generalizable to any LaTeX project, not just this specific one.
+        </p>
+    </section>
+
+
+
+    <section class="card">
+        <h2>Methodology</h2>
+        <h3>Generalized Pipeline</h3>
+        <p>
+            The implementation follows a structured, iterative approach:
+        </p>
+        <ol>
+            <li><strong>Discovery:</strong> Find the main <code>.tex</code> entry point, referenced assets, and build command.</li>
+            <li><strong>Safe Cleanup:</strong> Remove cache files, backups, and LaTeX build artifacts automatically.</li>
+            <li><strong>Asset Audit:</strong> Rank large files by compression potential and visual risk.</li>
+            <li><strong>Image Quality Policy:</strong> Protect text-heavy plots, diagrams, and screenshots from aggressive compression.</li>
+            <li><strong>Iterative Optimization:</strong> Apply one small batch of changes, compile, inspect, and either keep or revert.</li>
+            <li><strong>Verification:</strong> Confirm final size, compile success, and acceptable visual quality.</li>
+        </ol>
+
+        <h3>Image Quality Guardrails</h3>
+        <p>
+            The core constraint is that visual quality is non-negotiable:
+        </p>
+        <ul>
+            <li><strong>Preserve quality first</strong> for plots with labels, diagrams with fine lines, code screenshots, and any figure with small text.</li>
+            <li><strong>Compress more aggressively only</strong> for large photos or decorative images, and only if they are much larger than their display size.</li>
+            <li><strong>Never downsample</strong> text-heavy figures so far that axis labels, legends, or callouts become hard to read.</li>
+            <li><strong>Rollback rule:</strong> If a compression step makes the PDF less readable, revert it, even if the file got smaller.</li>
+        </ul>
+
+        <h3>Budget Awareness</h3>
+        <p>
+            With a fixed $25 OpenRouter API budget, the workflow uses deterministic heuristics (file analysis, duplicate detection, size measurement) for the first four stages, then uses LLM calls sparingly for semantic judgments only:
+        </p>
+        <ul>
+            <li>When deciding whether an unlabeled asset is really needed.</li>
+            <li>When evaluating whether a compressed image is still readable (via visual description).</li>
+            <li>When summarizing the final trials and trade-offs for the report.</li>
+        </ul>
+    </section>
+
+
+
+    <section class="card">
+        <h2>Baseline Measurements</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Project zip size (original)</td>
+                    <td>>118.9 MB</td>
+                    <td>Measured before any pruning.</td>
+                </tr>
+                <tr>
+                    <td>Compiled PDF size (original)</td>
+                    <td>~52 MB</td>
+                    <td>Measured from the original compiled PDF before compression trials.</td>
+                </tr>
+                <tr>
+                    <td>Main <code>.tex</code> file</td>
+                    <td><code>main_v3.tex</code></td>
+                    <td>CVPR 2026 paper template; discovered by agent.</td>
+                </tr>
+                <tr>
+                    <td>Largest asset</td>
+                    <td>3.9 MB (method_JEPA.jpg)</td>
+                    <td>Comparison figure; later recompressed to 1.8 MB.</td>
+                </tr>
+                <tr>
+                    <td>File count</td>
+                    <td>64 files</td>
+                    <td>Total in project tree; 14 were duplicates.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+
+
+    <section class="card">
+        <h2>Trials and Errors</h2>
+        <p>
+            Each trial in the optimization loop is recorded with:
+        </p>
+        <ul>
+            <li>The action taken (e.g., remove build artifacts, recompress an image)</li>
+            <li>Whether compilation succeeded</li>
+            <li>Visual quality assessment (is the PDF still readable?)</li>
+            <li>Size impact (how many MB did we save?)</li>
+            <li>Decision (keep this change or revert?)</li>
+        </ul>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Trial</th>
+                    <th>Action</th>
+                    <th>Compile</th>
+                    <th>PDF Quality</th>
+                    <th>Size Impact</th>
+                    <th>Decision</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Trial A (Initial Pass)</strong></td>
+                    <td>Remove duplicates + compress aggressively for maximum size reduction</td>
+                    <td>✓ Built PDF (22.243 MB)</td>
+                    <td>Failed visual integrity: missing referenced images (<code>illustration-v3.jpg</code>, <code>vis-v2.jpg</code>)</td>
+                    <td><strong>ZIP dropped to ~43.0 MB</strong></td>
+                    <td>✗ Rejected as final output</td>
+                </tr>
+                <tr>
+                    <td><strong>Trial B (Correction Pass)</strong></td>
+                    <td>Fix reference-check bug, restore removed images, recompile and verify all figures</td>
+                    <td>✓ Built PDF (27.9 MB)</td>
+                    <td>Passed visual integrity: all figures present and readable</td>
+                    <td><strong>ZIP finalized at 48.6 MB</strong></td>
+                    <td>✓ Accepted as final submission</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="margin-top: 20px;">
+            Failed attempts are intentionally included because they define the boundary between useful compression and unreadable output.
+        </p>
+
+        <h3>Trial Hierarchy (Big Trials vs Sub-Trials)</h3>
+        <p>
+            Each major trial was made up of smaller internal passes: cleanup, compression, validation, and either rollback or correction. That structure matters because the final result was not produced by a single lucky pass, but by a series of checks that made the workflow reliable.
+        </p>
+        <ul>
+            <li><strong>Big Trial A: Initial Size-First Run (Discarded)</strong>
+                <ul>
+                    <li><strong>A1:</strong> Safe cleanup and duplicate removal batch</li>
+                    <li><strong>A2:</strong> Standard image compression batch (quality 75)</li>
+                    <li><strong>A3:</strong> Aggressive image compression pass to push size lower</li>
+                    <li><strong>A4:</strong> Compile + visual validation discovered missing referenced figures</li>
+                </ul>
+            </li>
+            <li><strong>Big Trial B: Correction and Final Acceptance</strong>
+                <ul>
+                    <li><strong>B1:</strong> Debug duplicate-removal logic (reference path normalization fix)</li>
+                    <li><strong>B2:</strong> Restore missing referenced images from original source</li>
+                    <li><strong>B3:</strong> Rebuild PDF and re-check all figures</li>
+                    <li><strong>B4:</strong> Finalize corrected archive and accept final metrics</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Visual Evidence</h3>
+        <p>
+            The first pass left behind explicit missing-figure placeholders, while the compression checks below show the original renderings next to the first-pass compressed versions.
+        </p>
+
+        <h4>Removed Figures and Their Retained Counterparts</h4>
+        <div class="figure-pair">
+            <figure>
+                <img src="images/image_removal_one.png" alt="Missing figure placeholder for illustration-v3.jpg">
+                <figcaption>Initial-pass placeholder for <code>illustration-v3.jpg</code>.</figcaption>
+            </figure>
+            <figure>
+                <img src="images/non-removed_image_one.png" alt="Reference figure retained in the final set">
+                <figcaption>Reference figure retained in the final set.</figcaption>
+            </figure>
+        </div>
+        <div class="figure-pair">
+            <figure>
+                <img src="images/image_removal_two.png" alt="Missing figure placeholder for vis-v2.jpg">
+                <figcaption>Initial-pass placeholder for <code>vis-v2.jpg</code>.</figcaption>
+            </figure>
+            <figure>
+                <img src="images/none_removed_image_two.png" alt="Additional retained reference figure">
+                <figcaption>Additional retained reference figure.</figcaption>
+            </figure>
+        </div>
+
+        <h4>Original vs First-Pass Compression</h4>
+        <div class="figure-stack">
+            <figure>
+                <img src="images/original_images.png" alt="Original qualitative comparison grid">
+                <figcaption>Original qualitative comparison grid before compression.</figcaption>
+            </figure>
+            <figure>
+                <img src="images/first_iteration_compression.png" alt="First-pass compressed qualitative comparison grid">
+                <figcaption>Same comparison grid after the first compression pass.</figcaption>
+            </figure>
+        </div>
+    </section>
+
+
+
+    <section class="card">
+        <h2>Results</h2>
+        <h3>Iteration Story</h3>
+        <p>
+            The project was solved in two clear iterations rather than one perfect pass. Big Trial A prioritized size reduction and pushed the archive down to about 43 MB, but validation exposed a correctness problem: two referenced images were missing from the compiled output, so that smaller archive was intentionally discarded.
+        </p>
+        <ol>
+            <li><strong>Initial pass optimized for size first:</strong> The agent produced a 22.243 MB PDF and a smaller archive, but validation showed that the output was incomplete.</li>
+            <li><strong>Debug and correction pass:</strong> The duplicate-removal logic was fixed, the missing referenced images were restored, and the project was rebuilt.</li>
+            <li><strong>Final accepted pass:</strong> The corrected archive reached 48.6 MB and the PDF settled at 27.9 MB, satisfying both assignment limits while preserving the figures.</li>
+        </ol>
+
+        <p>
+            The nested A1-A4 and B1-B4 sub-trials belong in the story because they show how the result was built: cleanup, duplicate removal, compression, validation, rollback, repair, rebuild, and final acceptance. The failed branch is kept on purpose because it explains why the final branch mattered.
+        </p>
+
+        <h3>Final Measurements</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Original</th>
+                    <th>Final</th>
+                    <th>Savings</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Project directory size</td>
+                    <td>118.9 MB</td>
+                    <td><strong>48.6 MB</strong></td>
+                    <td><strong>↓70.3 MB (59.1%)</strong></td>
+                </tr>
+                <tr>
+                    <td>Compiled PDF size</td>
+                    <td>~60 MB (baseline)</td>
+                    <td><strong>27.9 MB</strong></td>
+                    <td><strong>↓32.1 MB (53.5%)</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>
+            The important takeaway is simple: aggressive compression only counts when the document is still correct. The smaller archive from Big Trial A was discarded, the image-reference bug was fixed, and the final result kept both the size target and the visual target.
+        </p>
+    </section>
+
+
+
+
+</main>
+
+</body>
+</html>
